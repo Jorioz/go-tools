@@ -1,0 +1,2121 @@
+{
+    "header": {
+        "gtfs_realtime_version": "1.0",
+        "incrementality": "FULL_DATASET",
+        "timestamp": 1768452920
+    },
+    "entity": [
+        {
+            "id": "20260114-41-41751",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-41-41751",
+                    "route_id": "01260426-41",
+                    "direction_id": 1,
+                    "start_time": "20:20:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8349",
+                    "label": "41 - Hamilton GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.2626343,
+                    "longitude": -79.9231339,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "00310",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-41-41840",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-41-41840",
+                    "route_id": "01260426-41",
+                    "direction_id": 0,
+                    "start_time": "21:00:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8435",
+                    "label": "41 - Pickering GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.68315,
+                    "longitude": -79.69228,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "02838",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768449535,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-41-41781",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-41-41781",
+                    "route_id": "01260426-41",
+                    "direction_id": 1,
+                    "start_time": "21:20:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "2536",
+                    "label": "41 - Hamilton GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.4314346,
+                    "longitude": -79.802,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "00138",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-47-47850",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-47-47850",
+                    "route_id": "01260426-47",
+                    "direction_id": 0,
+                    "start_time": "21:30:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8484",
+                    "label": "47  - Hwy. 407 Bus Term",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.77112,
+                    "longitude": -79.5769653,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "08041",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-12-12811",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-12-12811",
+                    "route_id": "01260426-12",
+                    "direction_id": 1,
+                    "start_time": "21:44:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "2503",
+                    "label": "12 - Niagara Falls",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.10855,
+                    "longitude": -79.079834,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "02408",
+                "current_status": "IN_TRANSIT_TO",
+                "timestamp": 1768452895,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-56-56811",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-56-56811",
+                    "route_id": "01260426-56",
+                    "direction_id": 0,
+                    "start_time": "21:50:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8460",
+                    "label": "56 - DC Oshawa GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.9013176,
+                    "longitude": -79.15957,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "02539",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452675,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-40-40830",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-40-40830",
+                    "route_id": "01260426-40",
+                    "direction_id": 0,
+                    "start_time": "22:05:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8424",
+                    "label": "40 - Richmond Hill Ctr",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.78415,
+                    "longitude": -79.5281,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "02674",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-40-40831",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-40-40831",
+                    "route_id": "01260426-40",
+                    "direction_id": 1,
+                    "start_time": "22:05:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8479",
+                    "label": "40 - Hamilton GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.2592163,
+                    "longitude": -79.90145,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "00732",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452795,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-LW-X1987",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-LW-X1987",
+                    "route_id": "01260426-LW",
+                    "direction_id": 1,
+                    "start_time": "22:07:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "603",
+                    "label": "LW - Niagara Falls GO (VIA Station)",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.1655426,
+                    "longitude": -79.37254,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "SCTH",
+                "current_status": "IN_TRANSIT_TO",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-41-41811",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-41-41811",
+                    "route_id": "01260426-41",
+                    "direction_id": 1,
+                    "start_time": "22:10:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8503",
+                    "label": "41 - Hamilton GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.78305,
+                    "longitude": -79.5243,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "02674",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452895,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-29-29880",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-29-29880",
+                    "route_id": "01260426-29",
+                    "direction_id": 0,
+                    "start_time": "22:20:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "2552",
+                    "label": "29 - Kipling Bus Terminal",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.463932,
+                    "longitude": -80.13887,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "00132",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768449895,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-94-94831",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-94-94831",
+                    "route_id": "01260426-94",
+                    "direction_id": 0,
+                    "start_time": "22:20:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8324",
+                    "label": "94  - Pickering GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.8342667,
+                    "longitude": -79.09225,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "00971",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-94-94830",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-94-94830",
+                    "route_id": "01260426-94",
+                    "direction_id": 1,
+                    "start_time": "22:25:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "2559",
+                    "label": "94  - Square One",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.6488838,
+                    "longitude": -79.60662,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "02660",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-47-47880",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-47-47880",
+                    "route_id": "01260426-47",
+                    "direction_id": 0,
+                    "start_time": "22:30:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8390",
+                    "label": "47  - Hwy. 407 Bus Term",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.583416,
+                    "longitude": -79.66209,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "00132",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-92-92830",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-92-92830",
+                    "route_id": "01260426-92",
+                    "direction_id": 1,
+                    "start_time": "22:30:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "2600",
+                    "label": "92 - Yorkdale Term",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.7275848,
+                    "longitude": -79.4493,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "00019",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-21-21833",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-21-21833",
+                    "route_id": "01260426-21",
+                    "direction_id": 1,
+                    "start_time": "22:30:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8542",
+                    "label": "21E - Lisgar GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.5854836,
+                    "longitude": -79.7420654,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "00730",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-33-33861",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-33-33861",
+                    "route_id": "01260426-33",
+                    "direction_id": 1,
+                    "start_time": "22:30:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8384",
+                    "label": "33 - U of Guelph",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.6749153,
+                    "longitude": -79.8222656,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "00296",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452895,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-25-25830",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-25-25830",
+                    "route_id": "01260426-25",
+                    "direction_id": 0,
+                    "start_time": "22:30:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8353",
+                    "label": "25  - Square One",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.5041161,
+                    "longitude": -79.9564362,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "02151",
+                "current_status": "IN_TRANSIT_TO",
+                "timestamp": 1768452895,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-GT-3937",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-GT-3937",
+                    "route_id": "01260426-GT",
+                    "direction_id": 1,
+                    "start_time": "22:34:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "669",
+                    "label": "GT - Kitchener GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.6245728,
+                    "longitude": -80.11618,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "GL",
+                "current_status": "IN_TRANSIT_TO",
+                "timestamp": 1768452919,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-56-56830",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-56-56830",
+                    "route_id": "01260426-56",
+                    "direction_id": 1,
+                    "start_time": "22:35:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8485",
+                    "label": "56 - Oakville GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.83875,
+                    "longitude": -79.40971,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "02771",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-21-21835",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-21-21835",
+                    "route_id": "01260426-21",
+                    "direction_id": 1,
+                    "start_time": "22:35:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8478",
+                    "label": "21A - Milton GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.5165672,
+                    "longitude": -79.85087,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "01016",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-61-61841",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-61-61841",
+                    "route_id": "01260426-61",
+                    "direction_id": 0,
+                    "start_time": "22:40:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "2532",
+                    "label": "61 - Bloomington GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.94105,
+                    "longitude": -79.39715,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "02767",
+                "current_status": "IN_TRANSIT_TO",
+                "timestamp": 1768452355,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-12-12841",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-12-12841",
+                    "route_id": "01260426-12",
+                    "direction_id": 1,
+                    "start_time": "22:44:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "2573",
+                    "label": "12 - Niagara Falls",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.17635,
+                    "longitude": -79.2500839,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "02402",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-48-48841",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-48-48841",
+                    "route_id": "01260426-48",
+                    "direction_id": 1,
+                    "start_time": "22:45:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8552",
+                    "label": "48 - U of Guelph",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.61035,
+                    "longitude": -79.75259,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "02597",
+                "current_status": "IN_TRANSIT_TO",
+                "timestamp": 1768452895,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-LW-1737",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-LW-1737",
+                    "route_id": "01260426-LW",
+                    "direction_id": 1,
+                    "start_time": "22:47:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "649",
+                    "label": "LW - West Harbour GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.3143,
+                    "longitude": -79.85282,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "AL",
+                "current_status": "STOPPED_AT",
+                "timestamp": 1768452906,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-48-48890",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-48-48890",
+                    "route_id": "01260426-48",
+                    "direction_id": 0,
+                    "start_time": "22:50:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "2590",
+                    "label": "48 - Hwy. 407 Bus Term",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.59522,
+                    "longitude": -79.75407,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "00129",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-92-92841",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-92-92841",
+                    "route_id": "01260426-92",
+                    "direction_id": 0,
+                    "start_time": "22:50:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8549",
+                    "label": "92 - DC Oshawa GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.8790169,
+                    "longitude": -78.94569,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "00342",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-56-56841",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-56-56841",
+                    "route_id": "01260426-56",
+                    "direction_id": 0,
+                    "start_time": "22:50:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "2591",
+                    "label": "56 - DC Oshawa GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.6991348,
+                    "longitude": -79.68362,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "02673",
+                "current_status": "STOPPED_AT",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-BR-6937",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-BR-6937",
+                    "route_id": "01260426-BR",
+                    "direction_id": 0,
+                    "start_time": "22:54:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "681",
+                    "label": "BR - Allandale Waterfront GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 44.07032,
+                    "longitude": -79.45748,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "EA",
+                "current_status": "IN_TRANSIT_TO",
+                "timestamp": 1768452918,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-68-68930",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-68-68930",
+                    "route_id": "01260426-68",
+                    "direction_id": 1,
+                    "start_time": "22:55:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "2542",
+                    "label": "68B - East Gwillimbury GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 44.08573,
+                    "longitude": -79.49075,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "02743",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452895,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-27-27850",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-27-27850",
+                    "route_id": "01260426-27",
+                    "direction_id": 0,
+                    "start_time": "23:00:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8553",
+                    "label": "27B - Finch Terminal",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.6302,
+                    "longitude": -79.683136,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "00019",
+                "current_status": "IN_TRANSIT_TO",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-47-47910",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-47-47910",
+                    "route_id": "01260426-47",
+                    "direction_id": 0,
+                    "start_time": "23:00:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8418",
+                    "label": "47  - Hwy. 407 Bus Term",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.37785,
+                    "longitude": -79.83279,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "00139",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452895,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-ST-7638",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-ST-7638",
+                    "route_id": "01260426-ST",
+                    "direction_id": 0,
+                    "start_time": "23:00:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "631",
+                    "label": "ST - Old Elm GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.9007568,
+                    "longitude": -79.26295,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "ST",
+                "current_status": "IN_TRANSIT_TO",
+                "timestamp": 1768452916,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-LW-1239",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-LW-1239",
+                    "route_id": "01260426-LW",
+                    "direction_id": 1,
+                    "start_time": "23:04:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "637",
+                    "label": "LW - Aldershot GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.4151459,
+                    "longitude": -79.7241058,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "AP",
+                "current_status": "IN_TRANSIT_TO",
+                "timestamp": 1768452919,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-40-40861",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-40-40861",
+                    "route_id": "01260426-40",
+                    "direction_id": 1,
+                    "start_time": "23:05:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "2528",
+                    "label": "40 - Hamilton GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.666832,
+                    "longitude": -79.59012,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "02209",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452895,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-LW-1040",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-LW-1040",
+                    "route_id": "01260426-LW",
+                    "direction_id": 0,
+                    "start_time": "23:05:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "643",
+                    "label": "LW - Union Station",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.6088524,
+                    "longitude": -79.5113144,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "MI",
+                "current_status": "IN_TRANSIT_TO",
+                "timestamp": 1768452917,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-30-30851",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-30-30851",
+                    "route_id": "01260426-30",
+                    "direction_id": 1,
+                    "start_time": "23:06:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8419",
+                    "label": "30  - U of Waterloo",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.7830162,
+                    "longitude": -79.52468,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "02205",
+                "current_status": "IN_TRANSIT_TO",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-LE-9041",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-LE-9041",
+                    "route_id": "01260426-LE",
+                    "direction_id": 1,
+                    "start_time": "23:09:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "663",
+                    "label": "LE - Union Station",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.6915245,
+                    "longitude": -79.27809,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "DA",
+                "current_status": "IN_TRANSIT_TO",
+                "timestamp": 1768452916,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-18-18900",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-18-18900",
+                    "route_id": "01260426-18",
+                    "direction_id": 0,
+                    "start_time": "23:10:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8496",
+                    "label": "18E - Union Station",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.3936157,
+                    "longitude": -79.75803,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "00263",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-40-40860",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-40-40860",
+                    "route_id": "01260426-40",
+                    "direction_id": 0,
+                    "start_time": "23:15:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "5012",
+                    "label": "40 - Richmond Hill Ctr",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.4152679,
+                    "longitude": -79.8203,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "00139",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-94-94861",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-94-94861",
+                    "route_id": "01260426-94",
+                    "direction_id": 0,
+                    "start_time": "23:20:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "2551",
+                    "label": "94  - Pickering GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.7078171,
+                    "longitude": -79.55428,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "00022",
+                "current_status": "IN_TRANSIT_TO",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-21-21860",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-21-21860",
+                    "route_id": "01260426-21",
+                    "direction_id": 0,
+                    "start_time": "23:20:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8355",
+                    "label": "21  - Union Station",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.5846825,
+                    "longitude": -79.7663345,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "01483",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-LE-9138",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-LE-9138",
+                    "route_id": "01260426-LE",
+                    "direction_id": 0,
+                    "start_time": "23:22:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "648",
+                    "label": "LE - Durham College Oshawa GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.7805634,
+                    "longitude": -79.12992,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "RO",
+                "current_status": "STOPPED_AT",
+                "timestamp": 1768452916,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-36-36861",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-36-36861",
+                    "route_id": "01260426-36",
+                    "direction_id": 1,
+                    "start_time": "23:25:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8303",
+                    "label": "36B - Bramalea Term",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.7074165,
+                    "longitude": -79.6136,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "08044",
+                "current_status": "IN_TRANSIT_TO",
+                "timestamp": 1768452895,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-GT-3040",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-GT-3040",
+                    "route_id": "01260426-GT",
+                    "direction_id": 0,
+                    "start_time": "23:26:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "601",
+                    "label": "GT - Union Station",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.65759,
+                    "longitude": -79.45058,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "BL",
+                "current_status": "STOPPED_AT",
+                "timestamp": 1768452910,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-31-31880",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-31-31880",
+                    "route_id": "01260426-31",
+                    "direction_id": 0,
+                    "start_time": "23:30:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "5007",
+                    "label": "31E - Union Station",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.6865845,
+                    "longitude": -79.8079147,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "00216",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-21-21863",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-21-21863",
+                    "route_id": "01260426-21",
+                    "direction_id": 1,
+                    "start_time": "23:30:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "2564",
+                    "label": "21E - Lisgar GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.56985,
+                    "longitude": -79.60157,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "02751",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452895,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-36-36870",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-36-36870",
+                    "route_id": "01260426-36",
+                    "direction_id": 0,
+                    "start_time": "23:30:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8524",
+                    "label": "36B - York Mills Term",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.7108154,
+                    "longitude": -79.61602,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "00022",
+                "current_status": "STOPPED_AT",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-33-33891",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-33-33891",
+                    "route_id": "01260426-33",
+                    "direction_id": 1,
+                    "start_time": "23:30:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8401",
+                    "label": "33E - Georgetown GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.71723,
+                    "longitude": -79.51295,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "00020",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452895,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-16-16861",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-16-16861",
+                    "route_id": "01260426-16",
+                    "direction_id": 1,
+                    "start_time": "23:30:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8320",
+                    "label": "16  - Hamilton GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.5288162,
+                    "longitude": -79.64295,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "01010",
+                "current_status": "IN_TRANSIT_TO",
+                "timestamp": 1768452895,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-GT-3539",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-GT-3539",
+                    "route_id": "01260426-GT",
+                    "direction_id": 1,
+                    "start_time": "23:34:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "660",
+                    "label": "GT - Mount Pleasant GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.7057724,
+                    "longitude": -79.5255,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "ET",
+                "current_status": "IN_TRANSIT_TO",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-25-25871",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-25-25871",
+                    "route_id": "01260426-25",
+                    "direction_id": 1,
+                    "start_time": "23:45:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8522",
+                    "label": "25  - U of Waterloo",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.5863,
+                    "longitude": -79.66075,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "00133",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452815,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-12-12871",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-12-12871",
+                    "route_id": "01260426-12",
+                    "direction_id": 1,
+                    "start_time": "23:46:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8439",
+                    "label": "12 - Niagara Falls",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.3888,
+                    "longitude": -79.8284149,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "00139",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-LW-1739",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-LW-1739",
+                    "route_id": "01260426-LW",
+                    "direction_id": 1,
+                    "start_time": "23:47:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "627",
+                    "label": "LW - West Harbour GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.6370659,
+                    "longitude": -79.4152756,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "EX",
+                "current_status": "STOPPED_AT",
+                "timestamp": 1768452918,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-19-19911",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-19-19911",
+                    "route_id": "01260426-19",
+                    "direction_id": 1,
+                    "start_time": "23:50:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8523",
+                    "label": "19 - Square One",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.782032,
+                    "longitude": -79.41448,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "01651",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452535,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-LE-9338",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-LE-9338",
+                    "route_id": "01260426-LE",
+                    "direction_id": 0,
+                    "start_time": "23:50:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "621",
+                    "label": "LE - Durham College Oshawa GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.6537056,
+                    "longitude": -79.34925,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "DA",
+                "current_status": "IN_TRANSIT_TO",
+                "timestamp": 1768452919,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-29-29891",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-29-29891",
+                    "route_id": "01260426-29",
+                    "direction_id": 1,
+                    "start_time": "23:55:00",
+                    "start_date": "20260114",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "2463",
+                    "label": "29 - Guelph Central GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.6358337,
+                    "longitude": -79.53754,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "02778",
+                "current_status": "INCOMING_AT",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-ST-7640",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-ST-7640",
+                    "route_id": "01260426-ST",
+                    "direction_id": 0,
+                    "start_time": "00:01:00",
+                    "start_date": "20260115",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "562",
+                    "label": "ST - Old Elm GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.6451,
+                    "longitude": -79.37857,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "UN",
+                "current_status": "STOPPED_AT",
+                "timestamp": 1768452918,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-96-96881",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-96-96881",
+                    "route_id": "01260426-96",
+                    "direction_id": 0,
+                    "start_time": "00:05:00",
+                    "start_date": "20260115",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "2582",
+                    "label": "96B - DC Oshawa GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.78235,
+                    "longitude": -79.41444,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "00013",
+                "current_status": "IN_TRANSIT_TO",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-30-30881",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-30-30881",
+                    "route_id": "01260426-30",
+                    "direction_id": 1,
+                    "start_time": "00:08:00",
+                    "start_date": "20260115",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8448",
+                    "label": "30  - U of Waterloo",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.783,
+                    "longitude": -79.5257,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "02674",
+                "current_status": "IN_TRANSIT_TO",
+                "timestamp": 1768452895,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-31-31910",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-31-31910",
+                    "route_id": "01260426-31",
+                    "direction_id": 0,
+                    "start_time": "00:30:00",
+                    "start_date": "20260115",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "2606",
+                    "label": "31E - Union Station",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.65613,
+                    "longitude": -79.9193649,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "02413",
+                "current_status": "IN_TRANSIT_TO",
+                "timestamp": 1768452915,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-31-31921",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-31-31921",
+                    "route_id": "01260426-31",
+                    "direction_id": 1,
+                    "start_time": "00:31:00",
+                    "start_date": "20260115",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "2505",
+                    "label": "31L - Bramalea GO",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.6434822,
+                    "longitude": -79.3763657,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "02300",
+                "current_status": "IN_TRANSIT_TO",
+                "timestamp": 1768451755,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-88-88950",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-88-88950",
+                    "route_id": "01260426-88",
+                    "direction_id": 0,
+                    "start_time": "01:04:00",
+                    "start_date": "20260115",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8555",
+                    "label": "88  - Trent U",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.8706322,
+                    "longitude": -78.8864,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "00159",
+                "current_status": "IN_TRANSIT_TO",
+                "timestamp": 1768452755,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        },
+        {
+            "id": "20260114-40-40920",
+            "is_deleted": false,
+            "trip_update": null,
+            "vehicle": {
+                "trip": {
+                    "trip_id": "20260114-40-40920",
+                    "route_id": "01260426-40",
+                    "direction_id": 0,
+                    "start_time": "01:15:00",
+                    "start_date": "20260115",
+                    "schedule_relationship": "SCHEDULED"
+                },
+                "vehicle": {
+                    "id": "8371",
+                    "label": "40 - Richmond Hill Ctr",
+                    "license_plate": ""
+                },
+                "position": {
+                    "latitude": 43.253,
+                    "longitude": -79.86967,
+                    "bearing": 0,
+                    "odometer": 0,
+                    "speed": 0
+                },
+                "stop_id": "00141",
+                "current_status": "IN_TRANSIT_TO",
+                "timestamp": 1768452895,
+                "congestion_level": "UNKNOWN_CONGESTION_LEVEL",
+                "occupancy_status": "EMPTY"
+            },
+            "alert": null
+        }
+    ]
+}

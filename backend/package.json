@@ -1,0 +1,25 @@
+{
+    "name": "go-tools-backend",
+    "version": "1.0.0",
+    "description": "Backend service for go-tools",
+    "license": "ISC",
+    "author": "Jorio",
+    "type": "module",
+    "main": "dist/index.js",
+    "scripts": {
+        "dev": "tsx src/index.ts",
+        "build": "tsc",
+        "start": "node dist/index.js"
+    },
+    "dependencies": {
+        "dotenv": "^17.2.3",
+        "express": "^5.2.1",
+        "ts-node": "^10.9.2"
+    },
+    "devDependencies": {
+        "@types/express": "^5.0.6",
+        "@types/node": "^25.0.8",
+        "tsx": "^4.21.0",
+        "typescript": "^5.9.3"
+    }
+}

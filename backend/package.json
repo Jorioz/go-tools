@@ -7,9 +7,11 @@
     "type": "module",
     "main": "dist/index.js",
     "scripts": {
-        "dev": "tsx src/index.ts",
+        "dev": "nodemon --exec tsx src/index.ts",
         "build": "tsc",
-        "start": "node dist/index.js"
+        "start": "node dist/index.js",
+        "docker:dev": "docker-compose -f compose-dev.yaml up --build",
+        "docker:prod": "docker-compose -f compose-prod.yaml up --build -d"
     },
     "dependencies": {
         "dotenv": "^17.2.3",
@@ -19,6 +21,7 @@
     "devDependencies": {
         "@types/express": "^5.0.6",
         "@types/node": "^25.0.8",
+        "nodemon": "^3.1.11",
         "tsx": "^4.21.0",
         "typescript": "^5.9.3"
     }

@@ -1,0 +1,14 @@
+services:
+    backend:
+        build:
+            context: .
+            target: development
+        ports:
+            - "3000:3000"
+        env_file:
+            - .env
+        volumes:
+            - ./src:/src/src
+            - ./package.json:/src/package.json
+            - ./tsconfig.json:/src/tsconfig.json
+        command: npm run dev

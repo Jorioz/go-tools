@@ -3,5 +3,6 @@ import { fileLogger } from "../utils/fileLogger.js";
 
 export async function testVehicleFetch() {
     const data = await fetchAllVehiclePositions();
-    fileLogger(JSON.stringify(data), "./src/logs/vehicleLog.json");
+    const logData = JSON.stringify(data) ?? "";
+    fileLogger(logData, "./src/logs/vehicleLog.json");
 }

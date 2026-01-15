@@ -3,7 +3,7 @@ import { Vehicle } from "./Vehicle.js";
 export class Entity {
     readonly id: string;
     readonly isDeleted: boolean;
-    readonly tripUdate: unknown;
+    readonly tripUpdate: unknown;
     readonly vehicle: Vehicle;
     readonly alert: unknown;
 
@@ -16,7 +16,7 @@ export class Entity {
     ) {
         this.id = id;
         this.isDeleted = isDeleted;
-        this.tripUdate = tripUpdate;
+        this.tripUpdate = tripUpdate;
         this.vehicle = vehicle;
         this.alert = alert;
     }

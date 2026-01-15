@@ -1,4 +1,4 @@
-import { Entity } from "../models/Entity.js";
+import { Entity } from "../../models/Entity.js";
 import { mapRawVehicle } from "./vehicleMapper.js";
 
 export function mapRawEntity(entity: any): Entity {

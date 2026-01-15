@@ -1,4 +1,4 @@
-import type { VehicleMetadata } from "../models/VehicleMetadata.js";
+import type { VehicleMetadata } from "../../models/VehicleMetadata.js";
 
 export function mapRawMetadata(metadata: any): VehicleMetadata {
     return {

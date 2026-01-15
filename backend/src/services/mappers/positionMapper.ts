@@ -1,4 +1,4 @@
-import type { Position } from "../models/Position.js";
+import type { Position } from "../../models/Position.js";
 
 export function mapRawPosition(position: any): Position {
     return {

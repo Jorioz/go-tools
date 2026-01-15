@@ -1,7 +1,7 @@
 import { mapRawTrip } from "./tripMapper.js";
 import { mapRawPosition } from "./positionMapper.js";
 import { mapRawMetadata } from "./metadataMapper.js";
-import { Vehicle } from "../models/Vehicle.js";
+import { Vehicle } from "../../models/Vehicle.js";
 
 export function mapRawVehicle(vehicle: any): Vehicle {
     return new Vehicle(

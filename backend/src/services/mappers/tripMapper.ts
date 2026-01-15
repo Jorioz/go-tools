@@ -1,4 +1,4 @@
-import type { Trip } from "../models/Trip.js";
+import type { Trip } from "../../models/Trip.js";
 
 export function mapRawTrip(trip: any): Trip {
     return {

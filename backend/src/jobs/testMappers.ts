@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import { mapRawEntity } from "../services/entityMapper.js";
+import { mapRawEntity } from "../services/mappers/entityMapper.js";
 
 export function testMappers() {
     try {

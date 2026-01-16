@@ -11,4 +11,5 @@ services:
             - ./src:/src/src
             - ./package.json:/src/package.json
             - ./tsconfig.json:/src/tsconfig.json
+            - ./data:/src/data
         command: npm run dev

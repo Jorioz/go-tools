@@ -2,6 +2,7 @@ import express from "express";
 
 import { testVehicleFetch } from "./jobs/testVehicleFetch.js";
 import { testMappers } from "./jobs/testMappers.js";
+import { testLoadAllRoutes } from "./jobs/testLoadRoutes.js";
 
 if (!process.env.GO_API_KEY) {
     throw new Error("Missing GO_API_KEY");
@@ -15,4 +16,5 @@ app.listen(port, () => {
 });
 
 //testVehicleFetch();
-testMappers();
+//testMappers();
+testLoadAllRoutes();

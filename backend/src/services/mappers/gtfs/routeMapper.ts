@@ -1,5 +1,5 @@
-import type { Route, RouteType } from "../../models/Route.js";
-import type { GtfsRouteRaw } from "../../integrations/gtfs/rawTypes.js";
+import type { Route, RouteType } from "../../../models/gtfs/Route.js";
+import type { GtfsRouteRaw } from "../../../integrations/gtfs/rawTypes.js";
 
 export function mapGtfsRoute(routeRaw: GtfsRouteRaw): Route {
     return {

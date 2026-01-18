@@ -3,6 +3,7 @@ import { loadTrainShapes } from "../integrations/gtfs/loader.js";
 import { mapGtfsShape } from "./mappers/gtfs/shapeMapper.js";
 import { DirectionType } from "../models/Trip.js";
 import csv from "csv-parser";
+import type { GtfsShapeRaw } from "../integrations/gtfs/rawTypes.js";
 
 // Direction Type:
 // 0: TO_UNION
@@ -33,7 +34,7 @@ export async function loadShapesForRoute(
         const results: Shape[] = [];
         loadTrainShapes()
             .pipe(csv())
-            .on("data", (rawRow) => {
+            .on("data", (rawRow: GtfsShapeRaw) => {
                 if (rawRow.shape_id && rawRow.shape_id.includes(lookup)) {
                     const shape = mapGtfsShape(rawRow);
                     results.push(shape);

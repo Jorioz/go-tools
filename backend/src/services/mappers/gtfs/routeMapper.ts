@@ -1,5 +1,8 @@
 import type { Route, RouteType } from "../../../models/gtfs/Route.js";
 import type { GtfsRouteRaw } from "../../../integrations/gtfs/rawTypes.js";
+import orderedStopsJson from "../../../../data/orderedStops.json" with { type: "json" };
+
+const orderedStops: { [key: string]: string[] } = orderedStopsJson;
 
 export function mapGtfsRoute(routeRaw: GtfsRouteRaw): Route {
     return {

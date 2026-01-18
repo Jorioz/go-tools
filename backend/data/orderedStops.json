@@ -1,0 +1,40 @@
+{
+    "MI": ["ML", "LS", "ME", "SR", "ER", "CO", "DI", "KP", "UN"],
+    "LW": [
+        "NI",
+        "SCTH",
+        "CF",
+        "WR",
+        "HA",
+        "AL",
+        "BU",
+        "AP",
+        "BO",
+        "OA",
+        "CL",
+        "PO",
+        "LO",
+        "MI",
+        "EX",
+        "UN"
+    ],
+    "LE": ["OS", "WH", "AJ", "PIN", "RO", "GU", "EG", "SC", "DA", "UN"],
+    "KI": [
+        "KI",
+        "GL",
+        "AC",
+        "GE",
+        "MO",
+        "BR",
+        "BE",
+        "MA",
+        "ET",
+        "WE",
+        "MD",
+        "BL",
+        "UN"
+    ],
+    "BR": ["AD", "BA", "BD", "EA", "NE", "AU", "KC", "MP", "RU", "DW", "UN"],
+    "RH": ["BM", "GO", "RI", "LA", "OL", "OR", "UN"],
+    "ST": ["LI", "ST", "MJ", "MR", "CE", "UI", "MK", "AG", "KE", "UN"]
+}

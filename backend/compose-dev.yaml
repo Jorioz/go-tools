@@ -7,9 +7,12 @@ services:
             - "3000:3000"
         env_file:
             - .env
+        environment:
+            - HOST_OS=linux
         volumes:
             - ./src:/src/src
             - ./package.json:/src/package.json
             - ./tsconfig.json:/src/tsconfig.json
             - ./data:/src/data
+            - /src/src/utils/.venv
         command: npm run dev

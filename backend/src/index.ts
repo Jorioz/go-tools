@@ -8,6 +8,7 @@ import { splitRawShapes } from "./jobs/splitRawShapes.js";
 import path from "path";
 import { testLoadShapesForRoute } from "./jobs/testLoadShapeForRoute.js";
 import { DirectionType } from "./models/Trip.js";
+import { runGtfsDataConfig } from "./config/gtfsDataConfig.js";
 
 if (!process.env.GO_API_KEY) {
     throw new Error("Missing GO_API_KEY");
@@ -25,4 +26,6 @@ app.listen(port, () => {
 //testLoadAllRoutes();
 //splitRawShapes();
 
-testLoadShapesForRoute("WH", DirectionType.TO_UNION);
+//testLoadShapesForRoute("WH", DirectionType.TO_UNION);
+
+runGtfsDataConfig();

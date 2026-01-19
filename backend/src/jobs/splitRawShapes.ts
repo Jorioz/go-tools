@@ -21,10 +21,9 @@ export function splitRawShapes() {
         }
         const shape_id = line.split(",")[0];
 
-        if (!isNaN(Number(shape_id))) {
-            break;
+        if (isNaN(Number(shape_id))) {
+            trainRows.unshift(line);
         }
-        trainRows.unshift(line);
     }
 
     trainRows.unshift(header ?? "");

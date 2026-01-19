@@ -3,6 +3,8 @@ FROM node:20-alpine AS development
 
 WORKDIR /src
 
+RUN apk add --no-cache python3 py3-pip py3-virtualenv
+
 COPY package*.json ./
 RUN npm install
 
@@ -25,6 +27,8 @@ RUN npm run build
 FROM node:20-alpine AS production
 
 WORKDIR /src
+
+RUN apk add --no-cache python3 py3-pip py3-virtualenv
 
 COPY package*.json ./
 RUN npm install --omit=dev

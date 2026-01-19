@@ -1,7 +1,7 @@
 import type { Stop } from "../../../models/gtfs/Stop.js";
 import type { GtfsStopRaw } from "../../../integrations/gtfs/rawTypes.js";
 
-export function stopMapper(stopRaw: GtfsStopRaw): Stop {
+export function mapGtfsStop(stopRaw: GtfsStopRaw): Stop {
     return {
         id: stopRaw.stop_id,
         name: stopRaw.stop_name,

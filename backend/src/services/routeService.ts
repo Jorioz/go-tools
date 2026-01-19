@@ -18,3 +18,22 @@ export async function loadAllRoutes(): Promise<Route[]> {
             .on("error", reject);
     });
 }
+
+export async function loadRouteByShortName(
+    shortName: string,
+): Promise<Route | null> {
+    return new Promise((resolve, reject) => {
+        const stream = loadRoutes().pipe(csv());
+
+        stream
+            .on("data", (rawRow: GtfsRouteRaw) => {
+                const route = mapGtfsRoute(rawRow);
+                if (route.shortName === shortName) {
+                    stream.destroy();
+                    resolve(route);
+                }
+            })
+            .on("end", () => resolve(null))
+            .on("error", reject);
+    });
+}

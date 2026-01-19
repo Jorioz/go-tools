@@ -8,13 +8,10 @@ export function loadRoutes() {
     return fs.createReadStream(path.join(GTFS_PATH, "routes.csv"));
 }
 
-// ts should not be here, most of shapes is useless, i only use train data. keeping it tho in case i need it one day
-export function loadShapes() {
-    return fs.createReadStream(path.join(GTFS_PATH, "shapes.csv"));
-}
-
 export function loadStops() {
-    return fs.createReadStream(path.join(GTFS_PATH, "stops.csv"));
+    return fs
+        .createReadStream(path.join(GTFS_PATH, "stops.csv"))
+        .pipe(stripBomStream());
 }
 
 export function loadTrainShapes() {

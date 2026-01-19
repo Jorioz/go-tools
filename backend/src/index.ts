@@ -9,6 +9,7 @@ import path from "path";
 import { testLoadShapesForRoute } from "./jobs/testLoadShapeForRoute.js";
 import { DirectionType } from "./models/Trip.js";
 import { runGtfsDataConfig } from "./config/gtfsDataConfig.js";
+import { buildRoutePackage } from "./jobs/buildRoutePackage.js";
 
 if (!process.env.GO_API_KEY) {
     throw new Error("Missing GO_API_KEY");
@@ -29,3 +30,11 @@ app.listen(port, () => {
 //testLoadShapesForRoute("WH", DirectionType.TO_UNION);
 
 runGtfsDataConfig();
+console.log("Beginning Route Build...");
+const pack = buildRoutePackage("LW");
+pack.then((result) => {
+    console.log(result);
+    console.log("Route build finished.");
+}).catch((err) => {
+    console.error("Error building route package:", err);
+});

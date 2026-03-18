@@ -1,0 +1,123 @@
+from typing import TypeAlias
+from enum import Enum, StrEnum
+
+class LINE_CODES(StrEnum):
+    MILTON = "MI"
+    LAKESHORE_WEST = "LW"
+    LAKESHORE_EAST = "LE"
+    KITCHENER = "GT" # Kitchener Line OG name is Georgetown (GT) and was never renamed internally
+    BARRIE = "BR"
+    RICHMOND_HILL = "RH"
+    STOUFFVILLE = "ST"
+
+class MILTON_STOPS(StrEnum):
+    MILTON = "ML"
+    LISGAR = "LS"
+    MEADOWVALE = "ME"
+    STREETSVILLE = "SR"
+    ERINDALE = "ER"
+    COOKSVILLE = "CO"
+    DIXIE = "DI"
+    KIPLING = "KP"
+    UNION = "UN"
+
+class LAKESHORE_WEST_STOPS(StrEnum):
+    NIAGARA_FALLS = "NI"
+    ST_CATHARINES = "SCTH"
+    CONFEDERATION = "CF"
+    WEST_HARBOUR = "WR"
+    HAMILTON = "HA"
+    ALDERSHOT = "AL"
+    BURLINGTON = "BU"
+    APPLEBY = "AP"
+    BRONTE = "BO"
+    OAKVILLE = "OA"
+    CLARKSON = "CL"
+    PORT_CREDIT = "PO"
+    LONG_BRANCH = "LO"
+    MIMICO = "MI"
+    EXHIBITION = "EX"
+    UNION = "UN"
+
+class LAKESHORE_EAST_STOPS(StrEnum):
+    OSHAWA = "OS"
+    WHITBY = "WH"
+    AJAX = "AJ"
+    PICKERING = "PIN"
+    ROUGE_HILL = "RO"
+    GUILDWOOD = "GU"
+    EGLINTON = "EG"
+    SCARBOROUGH = "SC"
+    DANFORTH = "DA"
+    UNION = "UN"
+
+class KITCHENER_STOPS(StrEnum):
+    KITCHENER = "KI"
+    GUELPH_CENTRAL = "GL"
+    ACTON = "AC"
+    GEORGETOWN = "GE"
+    MOUNT_PLEASANT = "MO"
+    BRAMPTON = "BR"
+    BRAMALEA = "BE"
+    MALTON = "MA"
+    ETOBICOKE_NORTH = "ET"
+    WESTON = "WE"
+    MOUNT_DENNIS = "MD"
+    BLOOR = "BL"
+    UNION = "UN"
+
+class BARRIE_STOPS(StrEnum):
+    ALLANDALE_WATERFRONT = "AD"
+    BARRIE_SOUTH = "BA"
+    BRADFORD = "BD"
+    EAST_GWILLIMBURY = "EA"
+    NEWMARKET = "NE"
+    AURORA = "AU"
+    KING_CITY = "KC"
+    MAPLE = "MP"
+    RUTHERFORD = "RU"
+    DOWNSVIEW_PARK = "DW"
+    UNION = "UN"
+
+class RICHMOND_HILL_STOPS(StrEnum):
+    BLOOMINGTON = "BM"
+    GORMLEY = "GO"
+    RICHMOND_HILL = "RI"
+    LANGSTAFF = "LA"
+    OLD_CUMMER = "OL"
+    ORIOLE = "OR"
+    UNION = "UN"
+
+class STOUFFVILLE_STOPS(StrEnum):
+    OLD_ELM = "LI"
+    STOUFFVILLE = "ST"
+    MOUNT_JOY = "MJ"
+    MARKHAM = "MR"
+    CENTENNIAL = "CE"
+    UNIONVILLE = "UI"
+    MILLIKEN = "MK"
+    AGINCOURT = "AG"
+    KENNEDY = "KE"
+    UNION = "UN"
+
+LineStopEnum: TypeAlias = (
+    type[MILTON_STOPS] |
+    type[LAKESHORE_WEST_STOPS] |
+    type[LAKESHORE_EAST_STOPS] |
+    type[KITCHENER_STOPS] |
+    type[BARRIE_STOPS] |
+    type[RICHMOND_HILL_STOPS] |
+    type[STOUFFVILLE_STOPS] 
+)
+
+LINE_STOPS: dict[LINE_CODES, LineStopEnum] = {
+    LINE_CODES.MILTON: MILTON_STOPS,
+    LINE_CODES.LAKESHORE_WEST: LAKESHORE_WEST_STOPS,
+    LINE_CODES.LAKESHORE_EAST: LAKESHORE_EAST_STOPS,
+    LINE_CODES.BARRIE: BARRIE_STOPS,
+    LINE_CODES.KITCHENER: KITCHENER_STOPS,
+    LINE_CODES.RICHMOND_HILL: RICHMOND_HILL_STOPS,
+    LINE_CODES.STOUFFVILLE: STOUFFVILLE_STOPS
+}
+
+

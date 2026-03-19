@@ -1,0 +1,26 @@
+services:
+    db:
+        image: postgres
+        container_name: go-tools-db
+        env_file:
+            - ./database/.env
+        ports:
+            - "5431:5432"
+        volumes:
+            - ./database:/var/lib/postgresql
+
+    backend:
+        build:
+            context: ./backend
+        container_name: go-tools-backend
+        ports:
+            - "8000:8000"
+        depends_on:
+            - db
+
+    frontend:
+        build:
+            context: ./frontend
+        container_name: go-tools-frontend
+        ports:
+            - "5173:5173"

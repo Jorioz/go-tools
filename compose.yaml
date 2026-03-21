@@ -1,3 +1,5 @@
+volumes:
+    go-tools-frontend-node_modules:
 services:
     db:
         image: postgres
@@ -23,4 +25,6 @@ services:
             context: ./frontend
         container_name: go-tools-frontend
         ports:
-            - "5173:5173"
+            - "3000:3000"
+        depends_on:
+            - backend

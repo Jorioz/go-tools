@@ -18,7 +18,7 @@ export default function ToolButton({
     href,
 }: Props) {
     const buttonClass =
-        "bg-neutral-900 col-span-1 border border-neutral-800 rounded-sm p-3 flex flex-col items-center gap-3 hover:bg-neutral-800 hover:border-neutral-700 duration-100 cursor-pointer";
+        "bg-neutral-900 col-span-1 w-full border border-neutral-800 rounded-sm p-3 flex flex-col items-center gap-3 hover:bg-neutral-800 hover:border-neutral-700 duration-100 cursor-pointer max-w-56";
 
     if (href) {
         return (

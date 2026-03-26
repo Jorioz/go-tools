@@ -1,5 +1,10 @@
 import React from "react";
+import SimpleMap from "./SimpleMap";
 
 export default function Tracker() {
-    return <div>Tracker</div>;
+    return (
+        <div>
+            <SimpleMap />
+        </div>
+    );
 }

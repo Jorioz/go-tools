@@ -1,5 +1,5 @@
 from typing import TypeAlias
-from enum import Enum, StrEnum
+from enum import StrEnum
 
 class LINE_CODES(StrEnum):
     MILTON = "MI"
@@ -26,6 +26,37 @@ class LAKESHORE_WEST_STOPS(StrEnum):
     ST_CATHARINES = "SCTH"
     CONFEDERATION = "CF"
     WEST_HARBOUR = "WR"
+    HAMILTON = "HA"
+    ALDERSHOT = "AL"
+    BURLINGTON = "BU"
+    APPLEBY = "AP"
+    BRONTE = "BO"
+    OAKVILLE = "OA"
+    CLARKSON = "CL"
+    PORT_CREDIT = "PO"
+    LONG_BRANCH = "LO"
+    MIMICO = "MI"
+    EXHIBITION = "EX"
+    UNION = "UN"
+
+class LAKESHORE_WEST_STOPS_NORMAL(StrEnum):
+    NIAGARA_FALLS = "NI"
+    ST_CATHARINES = "SCTH"
+    CONFEDERATION = "CF"
+    WEST_HARBOUR = "WR"
+    ALDERSHOT = "AL"
+    BURLINGTON = "BU"
+    APPLEBY = "AP"
+    BRONTE = "BO"
+    OAKVILLE = "OA"
+    CLARKSON = "CL"
+    PORT_CREDIT = "PO"
+    LONG_BRANCH = "LO"
+    MIMICO = "MI"
+    EXHIBITION = "EX"
+    UNION = "UN"
+
+class LAKESHORE_WEST_STOPS_EXT(StrEnum):
     HAMILTON = "HA"
     ALDERSHOT = "AL"
     BURLINGTON = "BU"
@@ -109,6 +140,11 @@ LineStopEnum: TypeAlias = (
     type[RICHMOND_HILL_STOPS] |
     type[STOUFFVILLE_STOPS] 
 )
+
+LAKESHORE_WEST_STOP_VARIANTS: dict[str, type[StrEnum]] = {
+    "normal": LAKESHORE_WEST_STOPS_NORMAL,
+    "extension": LAKESHORE_WEST_STOPS_EXT,
+}
 
 LINE_STOPS: dict[LINE_CODES, LineStopEnum] = {
     LINE_CODES.MILTON: MILTON_STOPS,

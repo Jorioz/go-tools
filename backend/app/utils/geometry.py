@@ -21,7 +21,7 @@ def progress_between_points(station_next: Point, station_prev: Point, train_pos:
     dist_train = lineshape.project(train_pos)
 
     total = abs(dist_prev - dist_next)
-    progress = abs(dist_train - dist_next)
+    progress = abs(dist_train - dist_prev)
     if total == 0:
         return 0.0
-    return min(max(progress / total, 0,0), 1.0)
+    return min(max(progress / total, 0.0), 1.0)

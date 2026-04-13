@@ -1,32 +1,59 @@
-from services.metrolinx_service import MetrolinxService, GoTrain
-from services.shape_manager import ShapeManager
-from services.stop_manager import StopManager
+from services.metrolinx_service import MetrolinxService
+from services.line_builder import LineBuilder
+from services.train_manager import TrainManager
 from pathlib import Path
-from constants import LINE_CODES, LINE_STOPS
-from typing import Any, Optional
-from geopandas import GeoDataFrame
-from pandas import DataFrame
+from constants import LINE_CODES, LAKESHORE_WEST_STOP_VARIANTS
+from models.line import Line
 
 data_dir = Path(__file__).parent.parent / "data"
 
 class LineManager:
     def __init__(self):
         self.go_service = MetrolinxService()
-        self.shape_manager = ShapeManager()
-        self.stop_manager = StopManager()
-        self.trains: list[GoTrain] = self.go_service.trains
-        self.shapes = self.shape_manager.shapes
-        self.lines = LINE_STOPS
+        self.line_builder = LineBuilder()
+        self.lines: dict[LINE_CODES, Line] = self._build_all_lines()
+        self.lakeshore_west_variants = self._build_lakeshore_west_variants()
+        self.train_manager = TrainManager(self.lines, self.lakeshore_west_variants)
 
-    def get_trains_by_line(self, line_code: LINE_CODES) -> list[GoTrain]:
-        return [train for train in self.trains if train.line_code == line_code]
+    def _build_all_lines(self) -> dict[LINE_CODES,Line]:
+        lines = {}
+        for line_code in LINE_CODES:
+            try:
+                lines[line_code] = self.line_builder.build(line_code)
+            except ValueError as e:
+                print(f"Failed to build line: {line_code}: {e}")
+        return lines
+
+    def _build_lakeshore_west_variants(self) -> dict[str, Line]:
+        variants: dict[str, Line] = {}
+        try:
+            normal_stop_ids = [stop.value for stop in LAKESHORE_WEST_STOP_VARIANTS["normal"]]
+            variants["normal"] = self.line_builder.build(
+                line_code=LINE_CODES.LAKESHORE_WEST,
+                stop_ids=normal_stop_ids,
+                shape_prefix="NI",
+            )
+        except ValueError:
+            print("Failed to build Lakeshore West normal variant.")
+
+        try:
+            hamilton_stop_ids = [stop.value for stop in LAKESHORE_WEST_STOP_VARIANTS["extension"]]
+            variants["extension"] = self.line_builder.build(
+                line_code=LINE_CODES.LAKESHORE_WEST,
+                stop_ids=hamilton_stop_ids,
+                shape_prefix="HA",
+            )
+        except ValueError:
+            print("Failed to build Lakeshore West Hamilton variant.")
+
+        return variants
     
-    def get_line_shape(self, line_code: LINE_CODES) ->Optional[GeoDataFrame]:
-        # Terminus is used to lookup a lines train track shape. (eg. MIUN (milton -> union), we use MI (Milton) for lookup)
-        terminus = list(self.lines[line_code])[0].value
-        return self.shape_manager.get_shape(terminus)
-    
-    def get_stops_for_line(self, line_code: LINE_CODES) -> DataFrame:
-        stop_enum = self.lines[line_code]
-        stop_ids = [stop.value for stop in stop_enum]
-        return self.stop_manager.get_stops_by_ids(stop_ids)
+    def refresh_trains(self) -> None:
+        raw_trains = self.go_service.get_train_data()
+        self.train_manager.upsert_many(raw_trains)
+
+    def get_train_states_for_line(self, line_code: LINE_CODES):
+        return [
+            state for state in self.train_manager.states.values()
+            if state.line_code == line_code
+        ]

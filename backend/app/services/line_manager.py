@@ -1,9 +1,10 @@
-from services.metrolinx_service import MetrolinxService
-from services.line_builder import LineBuilder
-from services.train_manager import TrainManager
 from pathlib import Path
-from constants import LINE_CODES, LAKESHORE_WEST_STOP_VARIANTS
-from models.line import Line
+
+from app.services.metrolinx_service import MetrolinxService
+from app.services.line_builder import LineBuilder
+from app.services.train_manager import TrainManager
+from app.constants import LINE_CODES, LAKESHORE_WEST_STOP_VARIANTS
+from app.models.line import Line
 
 data_dir = Path(__file__).parent.parent / "data"
 

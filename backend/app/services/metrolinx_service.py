@@ -9,7 +9,6 @@ from dataclasses import dataclass
 from typing import Dict, List, Any, Optional
 import warnings
 from datetime import datetime
-from constants import LINE_CODES
 
 
 @dataclass

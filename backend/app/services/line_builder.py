@@ -1,9 +1,10 @@
 from shapely.geometry import Point
-from constants import LINE_CODES, LINE_STOPS
-from models.line import Line
-from services.shape_manager import ShapeManager
-from services.stop_manager import StopManager
-from utils.geometry import shape_to_linestring
+
+from app.constants import LINE_CODES, LINE_STOPS
+from app.models.line import Line
+from app.services.shape_manager import ShapeManager
+from app.services.stop_manager import StopManager
+from app.utils.geometry import shape_to_linestring
 
 class LineBuilder:
     def __init__(self, 

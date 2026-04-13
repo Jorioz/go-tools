@@ -1,6 +1,6 @@
 from shapely.geometry import LineString, Point
 from dataclasses import dataclass, field
-from constants import LINE_CODES
+from app.constants import LINE_CODES
 
 @dataclass(frozen=True)
 class LineStop:

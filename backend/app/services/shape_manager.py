@@ -1,7 +1,6 @@
 import pandas as pd
 import geopandas as gpd
 from pathlib import Path
-from constants import LINE_STOPS
 from typing import Optional
 
 data_dir = Path(__file__).parent.parent / "data" / "gtfs"

@@ -1,7 +1,27 @@
-import React from "react";
-import { LINES, LINE_SPACING, UNION_BASE_Y, X_MULTIPLIER } from "./constants";
+import { AnimatePresence } from "motion/react";
+import React, { useEffect, useMemo, useState } from "react";
+import type { TrainModel } from "./models/train";
+import { LINES, LINE_SPACING, UNION_BASE_Y } from "./utils/constants";
+import { darken, lighten } from "./utils/color";
+import MiniTrainDot from "./MiniTrainDot";
 
-export default function UnionStation() {
+interface UnionStationProps {
+    trainsAtStop?: TrainModel[];
+}
+
+export default function UnionStation({ trainsAtStop = [] }: UnionStationProps) {
+    const [activeTrains, setActiveTrains] =
+        useState<TrainModel[]>(trainsAtStop);
+
+    useEffect(() => {
+        setActiveTrains(trainsAtStop);
+    }, [trainsAtStop]);
+
+    const lineColorByCode = useMemo(
+        () => new Map(LINES.map((line) => [line.id, line.color])),
+        [],
+    );
+
     const orders = LINES.map((line) => line.order);
     const minOrder = Math.min(...orders);
     const maxOrder = Math.max(...orders);
@@ -10,17 +30,33 @@ export default function UnionStation() {
     const bottomY = UNION_BASE_Y + maxOrder * LINE_SPACING;
     const height = bottomY - topY + 50;
 
-    const x = 7311 * X_MULTIPLIER;
+    const x = 7311;
     const width = 100;
 
     const rectX = x - width / 2;
+    const miniDotRadius = 25;
+    const miniDotGap = 25;
+    const labelY = topY - 150;
+    const miniDotRowY = labelY + 70;
+    const miniDotRowWidth =
+        activeTrains.length > 0
+            ? activeTrains.length * (miniDotRadius * 2) +
+              (activeTrains.length - 1) * miniDotGap
+            : 0;
+    const miniDotRowStartX = x - miniDotRowWidth / 2;
+    const activeTrips = activeTrains
+        .map((train) => train.trip_number)
+        .join(", ");
 
     return (
-        <g className="group">
+        <g className="group pointer-events-auto">
             <g
-                className="cursor-pointer hover:scale-110 transition-transform duration-200 ease-out pointer-events-auto"
+                className="cursor-pointer transition-transform duration-200 ease-out pointer-events-auto group-hover:scale-110"
                 style={{ transformOrigin: `${x}px ${topY + height / 2}px` }}
             >
+                {activeTrains.length > 0 && (
+                    <title>{`Stopped trains: ${activeTrips}`}</title>
+                )}
                 <rect
                     x={rectX - 50}
                     y={topY - 50}
@@ -35,18 +71,42 @@ export default function UnionStation() {
                     height={height}
                     rx={width / 2}
                     ry={width / 2}
-                    className="pointer-events-none fill-white stroke-0 group-hover:stroke-[20] transition-[stroke-width] duration-200 ease-out"
+                    className="pointer-events-none fill-white stroke-0 group-hover:stroke-20 transition-[stroke-width] duration-200 ease-out"
                     stroke="#fff"
                 />
             </g>
             <text
                 x={x}
-                y={topY - 150}
+                y={labelY}
                 textAnchor="middle"
-                className="pointer-events-none fill-neutral-300 text-[110px] select-none font-semibold"
+                className="pointer-events-auto cursor-pointer fill-neutral-800 text-[110px] select-none font-semibold"
             >
                 Union
             </text>
+            <AnimatePresence initial={false}>
+                {activeTrains.map((train, index) => {
+                    const cx =
+                        miniDotRowStartX +
+                        index * (miniDotRadius * 2 + miniDotGap) +
+                        miniDotRadius;
+                    const lineColor =
+                        lineColorByCode.get(train.line_code) ?? "#9ca3af";
+                    const miniDotFill = darken(lineColor, 0.35);
+                    const miniDotStroke = lighten(lineColor, 0.15);
+
+                    return (
+                        <MiniTrainDot
+                            key={train.trip_number}
+                            trainTripNumber={train.trip_number}
+                            cx={cx}
+                            cy={miniDotRowY}
+                            radius={miniDotRadius}
+                            fill={miniDotFill}
+                            stroke={miniDotStroke}
+                        />
+                    );
+                })}
+            </AnimatePresence>
         </g>
     );
 }

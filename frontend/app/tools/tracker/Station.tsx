@@ -1,4 +1,8 @@
-import React from "react";
+import { AnimatePresence } from "motion/react";
+import React, { useMemo } from "react";
+import type { TrainModel } from "./models/train";
+import { darken, lighten } from "./utils/color";
+import MiniTrainDot from "./MiniTrainDot";
 
 interface StationProps {
     x: number;
@@ -8,6 +12,7 @@ interface StationProps {
     labelPosition?: "top" | "bottom" | "left" | "right";
     isActive?: boolean;
     onClick?: () => void;
+    trainsAtStop?: TrainModel[];
 }
 
 export default function Station({
@@ -16,7 +21,15 @@ export default function Station({
     color,
     label,
     labelPosition = "top",
+    trainsAtStop = [],
 }: StationProps) {
+    const activeTrains = trainsAtStop;
+    const isOccupied = activeTrains.length > 0;
+    const activeTrips = useMemo(
+        () => activeTrains.map((train) => train.trip_number).join(", "),
+        [activeTrains],
+    );
+
     const getLabelCoordinates = (): {
         x: number;
         y: number;
@@ -36,13 +49,40 @@ export default function Station({
     };
 
     const labelCoords = getLabelCoordinates();
+    const miniDotRadius = 25;
+    const miniDotGap = 25;
+    const miniDotRowY = labelCoords.y + 52;
+    const miniDotRowWidth =
+        activeTrains.length > 0
+            ? activeTrains.length * (miniDotRadius * 2) +
+              (activeTrains.length - 1) * miniDotGap
+            : 0;
+
+    const estimatedLabelWidth = (label?.length ?? 0) * 58;
+    const labelCenterX = (() => {
+        if (labelCoords.anchor === "middle") {
+            return labelCoords.x;
+        }
+        if (labelCoords.anchor === "start") {
+            return labelCoords.x + estimatedLabelWidth / 2;
+        }
+        return labelCoords.x - estimatedLabelWidth / 2;
+    })();
+
+    const miniDotRowStartX = labelCenterX - miniDotRowWidth / 2;
+
+    const miniDotFill = darken(color, 0.35);
+    const miniDotStroke = lighten(color, 0.15);
 
     return (
-        <g className="group">
+        <g className="group pointer-events-auto">
             <g
-                className="cursor-pointer hover:scale-250 transition-transform duration-200 ease-out pointer-events-auto"
+                className="cursor-pointer transition-transform duration-200 ease-out pointer-events-auto group-hover:scale-250"
                 style={{ transformOrigin: `${x}px ${y}px` }}
             >
+                {isOccupied && (
+                    <title>{`Stopped trains: ${activeTrips}`}</title>
+                )}
                 <circle cx={x} cy={y} r="80" className="fill-transparent" />
                 <circle
                     cx={x}
@@ -53,14 +93,37 @@ export default function Station({
                 />
             </g>
             {label && (
-                <text
-                    x={labelCoords.x}
-                    y={labelCoords.y}
-                    textAnchor={labelCoords.anchor}
-                    className="pointer-events-none fill-neutral-300 text-[110px] select-none font-semibold"
-                >
-                    {label}
-                </text>
+                <>
+                    <text
+                        x={labelCoords.x}
+                        y={labelCoords.y}
+                        textAnchor={labelCoords.anchor}
+                        className="pointer-events-auto cursor-pointer fill-neutral-800 text-[110px] select-none font-semibold"
+                    >
+                        {label}
+                    </text>
+
+                    <AnimatePresence initial={false}>
+                        {activeTrains.map((train, index) => {
+                            const cx =
+                                miniDotRowStartX +
+                                index * (miniDotRadius * 2 + miniDotGap) +
+                                miniDotRadius;
+
+                            return (
+                                <MiniTrainDot
+                                    key={train.trip_number}
+                                    trainTripNumber={train.trip_number}
+                                    cx={cx}
+                                    cy={miniDotRowY}
+                                    radius={miniDotRadius}
+                                    fill={miniDotFill}
+                                    stroke={miniDotStroke}
+                                />
+                            );
+                        })}
+                    </AnimatePresence>
+                </>
             )}
         </g>
     );

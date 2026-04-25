@@ -65,8 +65,6 @@ def get_trains_for_line(line_code: str):
     
     return {
         "last_updated": refresher.last_updated,
-        "line_code": parsed_line_code.value,
-        "count": len(states),
-        "states": [asdict(state) for state in states]
+        "trains": [asdict(state) for state in states]
     }
 

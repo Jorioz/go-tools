@@ -47,3 +47,4 @@ export const TrainSchema = z
     });
 
 export type Train = z.infer<typeof TrainSchema>;
+export type TrainsByLine = Partial<Record<LineCode, Train[]>>;

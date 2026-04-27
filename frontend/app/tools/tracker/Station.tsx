@@ -1,6 +1,6 @@
 import { AnimatePresence } from "motion/react";
 import React, { useMemo } from "react";
-import type { TrainModel } from "./models/train";
+import type { Train } from "~/models/train";
 import { darken, lighten } from "./utils/color";
 import MiniTrainDot from "./MiniTrainDot";
 
@@ -12,7 +12,7 @@ interface StationProps {
     labelPosition?: "top" | "bottom" | "left" | "right";
     isActive?: boolean;
     onClick?: () => void;
-    trainsAtStop?: TrainModel[];
+    trainsAtStop?: Train[];
 }
 
 export default function Station({
@@ -26,7 +26,7 @@ export default function Station({
     const activeTrains = trainsAtStop;
     const isOccupied = activeTrains.length > 0;
     const activeTrips = useMemo(
-        () => activeTrains.map((train) => train.trip_number).join(", "),
+        () => activeTrains.map((train) => train.tripNumber).join(", "),
         [activeTrains],
     );
 
@@ -112,8 +112,8 @@ export default function Station({
 
                             return (
                                 <MiniTrainDot
-                                    key={train.trip_number}
-                                    trainTripNumber={train.trip_number}
+                                    key={train.tripNumber}
+                                    trainTripNumber={train.tripNumber}
                                     cx={cx}
                                     cy={miniDotRowY}
                                     radius={miniDotRadius}

@@ -1,17 +1,17 @@
 import { AnimatePresence } from "motion/react";
 import React, { useEffect, useMemo, useState } from "react";
-import type { TrainModel } from "./models/train";
+import type { Train } from "~/models/train";
 import { LINES, LINE_SPACING, UNION_BASE_Y } from "./utils/constants";
 import { darken, lighten } from "./utils/color";
 import MiniTrainDot from "./MiniTrainDot";
 
 interface UnionStationProps {
-    trainsAtStop?: TrainModel[];
+    trainsAtStop?: Train[];
 }
 
 export default function UnionStation({ trainsAtStop = [] }: UnionStationProps) {
     const [activeTrains, setActiveTrains] =
-        useState<TrainModel[]>(trainsAtStop);
+        useState<Train[]>(trainsAtStop);
 
     useEffect(() => {
         setActiveTrains(trainsAtStop);
@@ -45,7 +45,7 @@ export default function UnionStation({ trainsAtStop = [] }: UnionStationProps) {
             : 0;
     const miniDotRowStartX = x - miniDotRowWidth / 2;
     const activeTrips = activeTrains
-        .map((train) => train.trip_number)
+        .map((train) => train.tripNumber)
         .join(", ");
 
     return (
@@ -90,14 +90,14 @@ export default function UnionStation({ trainsAtStop = [] }: UnionStationProps) {
                         index * (miniDotRadius * 2 + miniDotGap) +
                         miniDotRadius;
                     const lineColor =
-                        lineColorByCode.get(train.line_code) ?? "#9ca3af";
+                        lineColorByCode.get(train.lineCode) ?? "#9ca3af";
                     const miniDotFill = darken(lineColor, 0.35);
                     const miniDotStroke = lighten(lineColor, 0.15);
 
                     return (
                         <MiniTrainDot
-                            key={train.trip_number}
-                            trainTripNumber={train.trip_number}
+                            key={train.tripNumber}
+                            trainTripNumber={train.tripNumber}
                             cx={cx}
                             cy={miniDotRowY}
                             radius={miniDotRadius}

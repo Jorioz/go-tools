@@ -1,9 +1,9 @@
 import { motion } from "motion/react";
-import type { TrainModel } from "./models/train";
+import type { Train } from "~/models/train";
 import { darken, lighten } from "./utils/color";
 
 interface TrainProps {
-    train: TrainModel;
+    train: Train;
     x: number;
     y: number;
     angleDeg: number;
@@ -97,7 +97,9 @@ export default function Train({
             }}
         >
             <title>
-                {`${train.trip_number} | ${train.prev_stop_code} -> ${train.next_stop_code} | ${Math.round(train.progress * 100)}%`}
+                {`${train.tripNumber} | ${train.prevStopCode} -> ${train.nextStopCode} | ${Math.round(
+                    train.progress * 100,
+                )}%`}
             </title>
             <polygon
                 points={markerPoints}

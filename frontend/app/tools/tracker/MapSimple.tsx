@@ -3,22 +3,21 @@ import Line from "./Line";
 import UnionStation from "./UnionStation";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { LINES, type LineCode } from "./utils/constants";
-import type { TrainModel } from "./models/train";
+import type { Train, TrainsByLine } from "~/models/train";
 
-interface MapSimpleProps {
-    trainsByLine: Partial<Record<LineCode, TrainModel[]>>;
-}
-
-export default function MapSimple({ trainsByLine }: MapSimpleProps) {
+export default function MapSimple({
+    trainsByLine,
+}: {
+    trainsByLine: TrainsByLine;
+}) {
     const unionStoppedTrains = useMemo(
         () =>
             Object.values(trainsByLine)
                 .flatMap((lineTrains) => lineTrains ?? [])
                 .filter(
                     (train) =>
-                        !train.in_motion &&
-                        train.stopped_at_stop_code.trim().toUpperCase() ===
-                            "UN",
+                        !train.inMotion &&
+                        train.stoppedAtStopCode.trim().toUpperCase() === "UN",
                 ),
         [trainsByLine],
     );

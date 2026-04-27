@@ -1,6 +1,6 @@
 import Station from "./Station";
 import Train from "./Train";
-import type { TrainModel } from "./models/train";
+import type { Train as TrainModel } from "~/models/train";
 import {
     buildTrainMarkers,
     type Point,
@@ -119,10 +119,9 @@ export default function Line({
     };
 
     const isStationStopped = (train: TrainModel) => {
-        if (!train.in_motion) {
-            return train.stopped_at_stop_code !== "";
+        if (!train.inMotion) {
+            return train.stoppedAtStopCode !== "";
         }
-
         return train.progress >= 0.96;
     };
 
@@ -130,23 +129,19 @@ export default function Line({
         if (!isStationStopped(train)) {
             return null;
         }
-
-        if (!train.in_motion) {
-            const stoppedCode = train.stopped_at_stop_code.trim();
+        if (!train.inMotion) {
+            const stoppedCode = train.stoppedAtStopCode.trim();
             return stoppedCode || null;
         }
-
-        const nextStopCode = train.next_stop_code.trim();
+        const nextStopCode = train.nextStopCode.trim();
         if (nextStopCode) {
             return nextStopCode;
         }
-
-        const stoppedCode = train.stopped_at_stop_code.trim();
+        const stoppedCode = train.stoppedAtStopCode.trim();
         if (stoppedCode) {
             return stoppedCode;
         }
-
-        const prevStopCode = train.prev_stop_code.trim();
+        const prevStopCode = train.prevStopCode.trim();
         return prevStopCode || null;
     };
 
@@ -158,7 +153,6 @@ export default function Line({
         if (!displayStopCode) {
             continue;
         }
-
         const stopName = getStopName(lineCode, displayStopCode);
         const existing = trainsByStoppedStationName.get(stopName) ?? [];
         existing.push(train);
@@ -237,7 +231,7 @@ export default function Line({
             {showTrains &&
                 trainMarkers.map((marker) => {
                     const isStoppedOnTrack =
-                        !marker.train.in_motion &&
+                        !marker.train.inMotion &&
                         !isStationStopped(marker.train);
                     const markerColor = isStoppedOnTrack
                         ? stoppedOnTrackColor
@@ -245,7 +239,7 @@ export default function Line({
 
                     return (
                         <Train
-                            key={marker.train.trip_number}
+                            key={marker.train.tripNumber}
                             train={marker.train}
                             x={marker.x}
                             y={marker.y}

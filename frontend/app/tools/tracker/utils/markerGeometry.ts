@@ -1,4 +1,4 @@
-import type { TrainModel } from "../models/train";
+import type { Train } from "~/models/train";
 
 export type Point = [number, number];
 
@@ -30,7 +30,7 @@ export type TrainMarkerOverlapAdjustment = {
 };
 
 export type TrainMarker = {
-    train: TrainModel;
+    train: Train;
     x: number;
     y: number;
     angleDeg: number;
@@ -451,26 +451,25 @@ export const buildTrainMarkers = ({
     extension,
     extensionSegment,
 }: {
-    trains: TrainModel[];
+    trains: Train[];
     points: Point[];
     getAnchor: (stopCode: string) => StopAnchor;
-    isStationStopped: (train: TrainModel) => boolean;
+    isStationStopped: (train: Train) => boolean;
     extension?: LineExtension;
     extensionSegment?: ExtensionSegment | null;
 }): TrainMarker[] => {
     const markers = trains
         .map<TrainMarker | null>((train) => {
-            const prevAnchor = getAnchor(train.prev_stop_code);
-            const nextAnchor = getAnchor(train.next_stop_code);
+            const prevAnchor = getAnchor(train.prevStopCode);
+            const nextAnchor = getAnchor(train.nextStopCode);
             const boundedProgress = clampProgress(train.progress);
             const isVisible = !isStationStopped(train);
 
-            if (!train.in_motion) {
-                const stoppedCode = train.stopped_at_stop_code.trim();
+            if (!train.inMotion) {
+                const stoppedCode = train.stoppedAtStopCode.trim();
                 if (!stoppedCode) {
                     return null;
                 }
-
                 const stoppedAnchor = getAnchor(stoppedCode);
                 return {
                     train,

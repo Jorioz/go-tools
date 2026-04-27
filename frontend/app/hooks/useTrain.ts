@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getAllTrains } from "~/services/train.service";
-import type { Train, TrainsByLine, LineCode } from "~/models/train";
-import { LineCodes } from "~/models/train";
+import type { TrainsByLine } from "~/models/train";
 
 const SERVER_REFRESH_INTERVAL = 15000;
 
-export function useTrains() {
+export function useTrain() {
     const [isLoading, setIsLoading] = useState(false);
     const [trainsByLine, setTrainsByLine] = useState<TrainsByLine>();
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null);

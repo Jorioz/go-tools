@@ -1,8 +1,7 @@
 import { z } from "zod";
 import type { LineCode, Train } from "~/models/train";
 import { LineCodes } from "~/models/train";
-const API_BASE_URL = "http://localhost:8000"; //import.meta.env.BASE_URL;
-
+const API_BASE_URL = "";
 const RawTrainSchema = z.object({
     trip_number: z.string(),
     line_code: LineCodes,
@@ -62,7 +61,7 @@ const toTrain = (raw: z.infer<typeof RawTrainSchema>): Train => ({
 async function apiFetch(
     endpoint: string,
 ): Promise<{ data: unknown; headers: Headers }> {
-    const url = `${API_BASE_URL}${endpoint}`;
+    const url = API_BASE_URL ? `${API_BASE_URL}${endpoint}` : endpoint;
     const res = await fetch(url);
     if (!res.ok) throw new Error("API Error fetching trains.");
     const data = await res.json();

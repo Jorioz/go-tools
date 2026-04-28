@@ -6,4 +6,13 @@ import svgr from "vite-plugin-svgr";
 
 export default defineConfig({
     plugins: [tailwindcss(), reactRouter(), tsconfigPaths(), svgr()],
+    server: {
+        proxy: {
+            "/api": {
+                target: "http://localhost:8000",
+                changeOrigin: true,
+                secure: false,
+            },
+        },
+    },
 });

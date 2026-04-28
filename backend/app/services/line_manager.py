@@ -1,5 +1,5 @@
 from pathlib import Path
-
+from app.config import GO_API_KEY
 from app.services.metrolinx_service import MetrolinxService
 from app.services.line_builder import LineBuilder
 from app.services.train_manager import TrainManager
@@ -10,7 +10,7 @@ data_dir = Path(__file__).parent.parent / "data"
 
 class LineManager:
     def __init__(self):
-        self.go_service = MetrolinxService()
+        self.go_service = MetrolinxService(api_key=GO_API_KEY)
         self.line_builder = LineBuilder()
         self.lines: dict[LINE_CODES, Line] = self._build_all_lines()
         self.lakeshore_west_variants = self._build_lakeshore_west_variants()

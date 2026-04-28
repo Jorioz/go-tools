@@ -9,7 +9,7 @@ from app.services.train_manager import TrainState
 
 
 class DataRefresher():
-    def __init__(self, refresh_interval = 15):
+    def __init__(self, refresh_interval):
         self.last_updated = None
         self.refresh_interval = refresh_interval
         self._cache: Dict[LINE_CODES, List[TrainState]] = {}

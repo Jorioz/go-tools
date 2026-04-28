@@ -2,8 +2,6 @@
 Service to fetch train data from the GO API
 sag = Service At Glance
 """
-from dotenv import load_dotenv
-import os
 import requests
 from dataclasses import dataclass
 from typing import Dict, List, Any, Optional
@@ -58,9 +56,8 @@ class GoTrain:
         )
 
 class MetrolinxService:
-    def __init__(self):
-        load_dotenv()
-        self.api_key = os.getenv("GO_API_KEY")
+    def __init__(self, api_key: str | None):
+        self.api_key = api_key
         if not self.api_key:
             raise ValueError(
                 "GO_API_KEY not found. Set it in an .env file."

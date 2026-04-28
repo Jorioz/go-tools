@@ -3,10 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from dataclasses import asdict
 
+from app.config import REFRESH_INTERVAL
 from app.constants import LINE_CODES
 from app.jobs.data_refresher import DataRefresher
 
-refresher = DataRefresher()
+refresher = DataRefresher(refresh_interval=REFRESH_INTERVAL)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

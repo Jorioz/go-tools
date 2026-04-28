@@ -19,7 +19,7 @@ export default function Tracker() {
     }
 
     return (
-        <div>
+        <div className="flex justify-center w-screen h-screen overflow-hidden">
             {bannerMessage && (
                 <Banner message={bannerMessage} type={bannerType} />
             )}

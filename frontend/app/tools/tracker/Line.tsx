@@ -175,6 +175,7 @@ export default function Line({
             xmlns="http://www.w3.org/2000/svg"
             viewBox={viewBox}
             className="w-full h-full"
+            overflow="visible"
         >
             {showBase && (
                 <>

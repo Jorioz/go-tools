@@ -1,7 +1,11 @@
-import React, { useMemo } from "react";
+import { useMemo, useRef, useEffect } from "react";
 import Line from "./Line";
 import UnionStation from "./UnionStation";
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import {
+    TransformWrapper,
+    TransformComponent,
+    useControls,
+} from "react-zoom-pan-pinch";
 import { LINES, type LineCode } from "./utils/constants";
 import type { Train, TrainsByLine } from "~/models/train";
 
@@ -22,23 +26,77 @@ export default function MapSimple({
         [trainsByLine],
     );
 
+    const transformRef = useRef<any>(null);
+
+    useEffect(() => {
+        const updateVh = () => {
+            document.documentElement.style.setProperty(
+                "--vh",
+                `${window.innerHeight * 0.01}px`,
+            );
+        };
+
+        const handleViewportChange = () => {
+            updateVh();
+            setTimeout(() => {
+                const api: any = transformRef.current;
+                if (!api) return;
+                const instance = api.instance ?? api;
+                if (typeof instance.centerView === "function") {
+                    instance.centerView();
+                } else if (typeof instance.resetTransform === "function") {
+                    instance.resetTransform();
+                } else if (
+                    typeof api.setTransform === "function" &&
+                    api.state
+                ) {
+                    api.setTransform(0, 0, api.state.scale);
+                }
+            }, 80);
+        };
+
+        handleViewportChange();
+        window.addEventListener("resize", handleViewportChange);
+        window.addEventListener("orientationchange", handleViewportChange);
+        return () => {
+            window.removeEventListener("resize", handleViewportChange);
+            window.removeEventListener(
+                "orientationchange",
+                handleViewportChange,
+            );
+        };
+    }, []);
+
     return (
-        <div className="w-full h-svh bg-neutral-300">
+        <div className="w-full h-full bg-neutral-300 flex justify-center items-center px-10">
             <TransformWrapper
-                initialScale={1}
+                ref={transformRef}
+                initialScale={2}
                 minScale={1}
                 maxScale={10}
                 centerOnInit
                 doubleClick={{ disabled: true }}
-                wheel={{ smoothStep: 0.01 }}
+                wheel={{ smoothStep: 0.005 }}
                 panning={{ disabled: false }}
-                limitToBounds={false}
+                limitToBounds={true}
             >
                 <TransformComponent
-                    wrapperStyle={{ width: "100%", height: "100%" }}
-                    contentStyle={{ width: "100%", height: "100%" }}
+                    wrapperStyle={{
+                        width: "100%",
+                        height: "100%",
+                        overflow: "visible",
+                    }}
+                    contentStyle={{ width: "100%", overflow: "visible" }}
                 >
-                    <div className="relative w-full h-full">
+                    <div
+                        className="w-full"
+                        style={{
+                            height: "calc(var(--vh, 1vh) * 50)",
+                            width: "100svw",
+                            margin: "0 auto",
+                            position: "relative",
+                        }}
+                    >
                         {/* Map #1 draws out the Lines, no Trains */}
                         {LINES.map((line) => (
                             <div
@@ -60,15 +118,21 @@ export default function MapSimple({
                             </div>
                         ))}
                         <div className="absolute inset-0 pointer-events-none">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 13205 9500"
+                            <div
+                                style={{ aspectRatio: "13205 / 9500" }}
                                 className="w-full h-full"
                             >
-                                <UnionStation
-                                    trainsAtStop={unionStoppedTrains}
-                                />
-                            </svg>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 13205 9500"
+                                    width="100%"
+                                    height="100%"
+                                >
+                                    <UnionStation
+                                        trainsAtStop={unionStoppedTrains}
+                                    />
+                                </svg>
+                            </div>
                         </div>
                         {/* Map #2 draws out the Trains, no Line */}
                         {LINES.map((line) => (

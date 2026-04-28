@@ -1,8 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { getAllTrains } from "~/services/train.service";
 import type { TrainsByLine } from "~/models/train";
-
-const SERVER_REFRESH_INTERVAL = 15000;
 
 export function useTrain() {
     const [isLoading, setIsLoading] = useState(false);
@@ -32,23 +30,7 @@ export function useTrain() {
         }
     }, []);
 
-    useEffect(() => {
-        let timeout: number | undefined;
-        const scheduleNextFetch = () => {
-            let delay = 0;
-            if (lastUpdated) {
-                const elapsed = Date.now() - lastUpdated.getTime();
-                delay = Math.max(SERVER_REFRESH_INTERVAL - elapsed, 0);
-            }
-            timeout = window.setTimeout(fetchAll, delay);
-        };
-        fetchAll();
-        scheduleNextFetch();
-        return () => {
-            if (timeout) clearTimeout(timeout);
-        };
-    }, [fetchAll]);
-
+    // No automatic scheduling: consumers call `refresh()` when they want new data.
     const refresh = useCallback(() => {
         fetchAll();
     }, [fetchAll]);

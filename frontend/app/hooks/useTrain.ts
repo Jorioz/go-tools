@@ -3,6 +3,7 @@ import { getAllTrains } from "~/services/train.service";
 import type { TrainsByLine } from "~/models/train";
 
 const DEFAULT_INTERVAL = 15;
+const OFFSET = 15;
 
 export function useTrain() {
     const [isLoading, setIsLoading] = useState(false);
@@ -12,6 +13,8 @@ export function useTrain() {
 
     const lastUpdatedRef = useRef<Date | null>(null);
     const intervalRef = useRef<number>(DEFAULT_INTERVAL);
+    const [refreshInterval, setRefreshInterval] =
+        useState<number>(DEFAULT_INTERVAL);
     const timerIdRef = useRef<number | null>(null);
     const mountedRef = useRef(false);
 
@@ -33,8 +36,9 @@ export function useTrain() {
 
         if (lastUpdatedDate) {
             const elapsed = now - lastUpdatedDate.getTime();
-            const mod = elapsed % intervalMs;
-            delay = mod === 0 ? intervalMs : intervalMs - mod;
+            const mod = ((elapsed % intervalMs) + intervalMs) % intervalMs;
+            const base = mod === 0 ? intervalMs : intervalMs - mod;
+            delay = base + OFFSET;
             if (delay < 250) delay = intervalMs;
         }
 
@@ -53,6 +57,7 @@ export function useTrain() {
             const data = await getAllTrains();
             const returnedInterval = data.refreshInterval ?? DEFAULT_INTERVAL;
             intervalRef.current = returnedInterval;
+            setRefreshInterval(returnedInterval);
 
             const serverLast = data.lastUpdated;
             if (
@@ -66,6 +71,10 @@ export function useTrain() {
             }
 
             scheduleNext(returnedInterval, data.lastUpdated);
+            console.log("[useTrain] fetchAll", {
+                returnedInterval,
+                lastUpdated: serverLast?.toISOString(),
+            });
         } catch (err) {
             setError(err as Error);
 
@@ -97,5 +106,7 @@ export function useTrain() {
         isLoading,
         error,
         refresh,
+        refreshInterval,
+        OFFSET,
     };
 }

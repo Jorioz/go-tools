@@ -68,11 +68,11 @@ export default function MapSimple({
     }, []);
 
     return (
-        <div className="w-full h-full bg-neutral-300 flex justify-center items-center px-10">
+        <div className="w-full flex-1 bg-neutral-300 flex justify-center items-center px-10">
             <TransformWrapper
                 ref={transformRef}
                 initialScale={2}
-                minScale={1}
+                minScale={1.5}
                 maxScale={10}
                 centerOnInit
                 doubleClick={{ disabled: true }}
@@ -91,7 +91,7 @@ export default function MapSimple({
                     <div
                         className="w-full"
                         style={{
-                            height: "calc(var(--vh, 1vh) * 50)",
+                            height: "calc(var(--vh, 1vh) * 70)",
                             width: "100svw",
                             margin: "0 auto",
                             position: "relative",

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import MapSimple from "./MapSimple";
 import Banner from "../../../components/Banner";
-import { useTrain } from "~/hooks/useTrain";
+import { useTrainContext } from "~/context/trainContext";
 
 export default function Tracker() {
-    const { trainsByLine, isLoading, error, refresh, lastUpdated } = useTrain();
+    const { trainsByLine, isLoading, error, refresh, lastUpdated } =
+        useTrainContext();
     let bannerMessage: string | null = null;
     let bannerType: "error" | "warning" | "info" | "success" | "generic" =
         "generic";

@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response, Request
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from dataclasses import asdict
@@ -30,11 +30,16 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["X-Refresh-Interval", "X-Last-Updated", "Last-Modified"],
 )
 
-@app.get("/")
-def read_root():
-    return {"message": "FastAPI server is running!"}
+@app.middleware("http")
+async def add_meta_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Refresh-Interval"] = str(REFRESH_INTERVAL)
+    last_updated = refresher.last_updated
+    response.headers["X-Last-Updated"] = last_updated.isoformat() if last_updated else ""
+    return response
 
 @app.get("/api/trains")
 def get_all_trains():
@@ -42,7 +47,6 @@ def get_all_trains():
         line_code.value: [asdict(state) for state in refresher.get_states(line_code)] for line_code in LINE_CODES
     }
     return {
-        "last_updated": refresher.last_updated,
         "lines": data
     }
 
@@ -65,7 +69,6 @@ def get_trains_for_line(line_code: str):
     states = refresher.get_states(parsed_line_code)
     
     return {
-        "last_updated": refresher.last_updated,
         "trains": [asdict(state) for state in states]
     }
 

@@ -22,22 +22,20 @@ const RawTrainSchema = z.object({
 });
 
 const RawByLineResponse = z.object({
-    last_updated: z.coerce.date(),
     trains: z.array(RawTrainSchema),
 });
 
 const RawAllTrainsResponse = z.object({
-    last_updated: z.coerce.date(),
     lines: z.record(LineCodes, z.array(RawTrainSchema)),
 });
 
 type ByLineResponse = {
-    lastUpdated: Date;
+    lastUpdated: Date | null;
     trains: Train[];
 };
 
 type AllTrainsResponse = {
-    lastUpdated: Date;
+    lastUpdated: Date | null;
     lines: Partial<Record<LineCode, Train[]>>;
 };
 
@@ -59,22 +57,35 @@ const toTrain = (raw: z.infer<typeof RawTrainSchema>): Train => ({
     stoppedAtStopCode: raw.stopped_at_stop_code,
 });
 
-async function apiFetch(endpoint: string): Promise<unknown> {
+async function apiFetch(
+    endpoint: string,
+): Promise<{ data: unknown; headers: Headers }> {
     const url = `${API_BASE_URL}${endpoint}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error("API Error fetching trains.");
-    return res.json();
+    const data = await res.json();
+    return { data, headers: res.headers };
+}
+
+function parseLastUpdated(headers: Headers): Date | null {
+    const hdr =
+        headers.get("x-last-updated") ||
+        headers.get("last-modified") ||
+        headers.get("last-updated");
+    if (!hdr) return null;
+    const d = new Date(hdr);
+    return isNaN(d.getTime()) ? null : d;
 }
 
 export async function getAllTrains(): Promise<AllTrainsResponse> {
-    const data = await apiFetch("/api/trains");
+    const { data, headers } = await apiFetch("/api/trains");
     const parsed = RawAllTrainsResponse.parse(data);
     const lines: AllTrainsResponse["lines"] = {};
     for (const [lineCode, trains] of Object.entries(parsed.lines)) {
-        lines[lineCode as LineCode] = trains.map(toTrain);
+        lines[lineCode as LineCode] = (trains as any[]).map(toTrain);
     }
     return {
-        lastUpdated: parsed.last_updated,
+        lastUpdated: parseLastUpdated(headers),
         lines,
     };
 }
@@ -82,10 +93,10 @@ export async function getAllTrains(): Promise<AllTrainsResponse> {
 export async function getTrainsByLine(
     lineCode: LineCode,
 ): Promise<ByLineResponse> {
-    const data = await apiFetch(`/api/trains/${lineCode}`);
+    const { data, headers } = await apiFetch(`/api/trains/${lineCode}`);
     const parsed = RawByLineResponse.parse(data);
     return {
-        lastUpdated: parsed.last_updated,
+        lastUpdated: parseLastUpdated(headers),
         trains: parsed.trains.map(toTrain),
     };
 }

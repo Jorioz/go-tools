@@ -6,7 +6,8 @@ import { useTrain } from "~/hooks/useTrain";
 export default function Tracker() {
     const { trainsByLine, isLoading, error, refresh, lastUpdated } = useTrain();
     let bannerMessage: string | null = null;
-    let bannerType: "error" | "warning" | "info" | "success" | "generic" = "generic";
+    let bannerType: "error" | "warning" | "info" | "success" | "generic" =
+        "generic";
     if (error) {
         if (error.message === "Failed to fetch") {
             bannerMessage = "Live trains are currently unavailable.";
@@ -19,7 +20,9 @@ export default function Tracker() {
 
     return (
         <div>
-            {bannerMessage && <Banner message={bannerMessage} type={bannerType} />}
+            {bannerMessage && (
+                <Banner message={bannerMessage} type={bannerType} />
+            )}
             <MapSimple trainsByLine={trainsByLine ?? {}} />
         </div>
     );

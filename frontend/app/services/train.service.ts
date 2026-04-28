@@ -31,11 +31,13 @@ const RawAllTrainsResponse = z.object({
 
 type ByLineResponse = {
     lastUpdated: Date | null;
+    refreshInterval: number | null;
     trains: Train[];
 };
 
 type AllTrainsResponse = {
     lastUpdated: Date | null;
+    refreshInterval: number | null;
     lines: Partial<Record<LineCode, Train[]>>;
 };
 
@@ -77,6 +79,13 @@ function parseLastUpdated(headers: Headers): Date | null {
     return isNaN(d.getTime()) ? null : d;
 }
 
+function parseRefreshInterval(headers: Headers): number | null {
+    const v = headers.get("x-refresh-interval");
+    if (!v) return null;
+    const n = Number(v);
+    return Number.isFinite(n) && n > 0 ? Math.floor(n) : null;
+}
+
 export async function getAllTrains(): Promise<AllTrainsResponse> {
     const { data, headers } = await apiFetch("/api/trains");
     const parsed = RawAllTrainsResponse.parse(data);
@@ -86,6 +95,7 @@ export async function getAllTrains(): Promise<AllTrainsResponse> {
     }
     return {
         lastUpdated: parseLastUpdated(headers),
+        refreshInterval: parseRefreshInterval(headers),
         lines,
     };
 }
@@ -97,6 +107,7 @@ export async function getTrainsByLine(
     const parsed = RawByLineResponse.parse(data);
     return {
         lastUpdated: parseLastUpdated(headers),
+        refreshInterval: parseRefreshInterval(headers),
         trains: parsed.trains.map(toTrain),
     };
 }

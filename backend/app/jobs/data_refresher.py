@@ -39,6 +39,13 @@ class DataRefresher():
                 self.last_updated = datetime.now()
                 print(f"[{self.last_updated.strftime('%Y-%m-%d %H:%M:%S')}] Data refresh completed")
         except Exception as exc:
+            with self._lock:
+                for line_code in LINE_CODES:
+                    self._cache[line_code] = []
+
+            if isinstance(exc, TypeError) and "NoneType" in str(exc) and "subscriptable" in str(exc):
+                return
+
             now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             print(f"[{now}] WARNING - Data refresh failed: {exc}")
 

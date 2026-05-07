@@ -5,7 +5,6 @@ sag = Service At Glance
 import requests
 from dataclasses import dataclass
 from typing import Dict, List, Any, Optional
-import warnings
 from datetime import datetime
 
 
@@ -32,6 +31,20 @@ class GoTrain:
     modified_date: str
 
     @staticmethod
+    def _safe_float(value: Any, default: float = 0.0) -> float:
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return default
+
+    @staticmethod
+    def _safe_int(value: Any, default: int = 0) -> int:
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return default
+
+    @staticmethod
     def from_dict(data: Dict[str, Any]) -> GoTrain:
         return GoTrain(
             cars=data.get("Cars", ""),
@@ -42,11 +55,11 @@ class GoTrain:
             route_number=data.get("RouteNumber", ""),
             variant_dir=data.get("VariantDir", ""),
             display=data.get("Display", ""),
-            latitude=float(data.get("Latitude", 0)),
-            longitude=float(data.get("Longitude", 0)),
+            latitude=GoTrain._safe_float(data.get("Latitude", 0)),
+            longitude=GoTrain._safe_float(data.get("Longitude", 0)),
             is_in_motion=bool(data.get("IsInMotion", False)),
-            delay_seconds=int(data.get("DelaySeconds", 0)),
-            course=int(data.get("Course", 0)),
+            delay_seconds=GoTrain._safe_int(data.get("DelaySeconds", 0)),
+            course=GoTrain._safe_int(data.get("Course", 0)),
             first_stop_code=data.get("FirstStopCode", ""),
             last_stop_code=data.get("LastStopCode", ""),
             prev_stop_code=data.get("PrevStopCode", ""),
@@ -82,7 +95,24 @@ class MetrolinxService:
     def _fetch_sag_trains(self, endpoint = "api/V1/ServiceataGlance/Trains/All") -> List[Dict[str, Any]]:
         try:
             data = self._fetch(endpoint)
-            return data["Trips"]["Trip"]
+            if not isinstance(data, dict):
+                return []
+
+            trips_container = data.get("Trips") or {}
+            if not isinstance(trips_container, dict):
+                return []
+
+            trips = trips_container.get("Trip", [])
+            if trips is None:
+                return []
+
+            if isinstance(trips, list):
+                return [trip for trip in trips if isinstance(trip, dict)]
+
+            if isinstance(trips, dict):
+                return [trips]
+
+            return []
         except RuntimeError as fetch_err:
             print(f"Error getting SAG Trains Data. See Fetch Error -> {fetch_err}")
             return []
@@ -90,7 +120,7 @@ class MetrolinxService:
     def _map_trains(self):
         trips = self._fetch_sag_trains()
         if not trips:
-            warnings.warn("No Trips found from API.", UserWarning)
+            self.trains = []
             return
         self.trains = [GoTrain.from_dict(trip) for trip in trips]
         self.last_updated = datetime.now()

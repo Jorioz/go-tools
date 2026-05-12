@@ -1,13 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import MapSimple from "./MapSimple";
 import Banner from "../../../components/Banner";
 import { useTrainContext } from "~/context/trainContext";
 import Timer from "~/tools/tracker/components/Timer";
 import Legend from "./components/Legend";
+import InfoBox from "./components/InfoBox";
+import type { Train } from "~/models/train";
+import { useMapSelection } from "~/hooks/useMapSelection";
 
 export default function Tracker() {
     const { trainsByLine, isLoading, error, refresh, lastUpdated } =
         useTrainContext();
+    const {
+        selected,
+        selectTrain,
+        selectStation,
+        selectUnion,
+        setSelectedEntity,
+        clearSelection,
+    } = useMapSelection();
+    const isInfoBoxActive = selected !== null;
+
+    // todo: move banner state outside?
     let bannerMessage: string | null = null;
     let bannerType: "error" | "warning" | "info" | "success" | "generic" =
         "generic";
@@ -26,8 +40,13 @@ export default function Tracker() {
             {bannerMessage && (
                 <Banner message={bannerMessage} type={bannerType} />
             )}
-            <MapSimple trainsByLine={trainsByLine ?? {}} />
-            <div className="fixed bottom-3 w-full flex justify-between items-end z-40 px-2">
+            <MapSimple
+                trainsByLine={trainsByLine ?? {}}
+                selected={selected}
+                onSelect={setSelectedEntity}
+            />
+            <InfoBox isActive={isInfoBoxActive} onToggle={clearSelection} />
+            <div className="fixed bottom-3 w-full flex justify-between md:justify-start md:gap-3 items-end z-40 px-2">
                 <Legend />
                 <div className="flex items-center justify-center h-full w-fit">
                     <Timer />

@@ -17,6 +17,9 @@ services:
         container_name: go-tools-backend
         ports:
             - "8000:8000"
+        volumes:
+            - ./backend/app/data/gtfs/raw:/app/app/data/gtfs/raw
+            - ./backend/app/data/gtfs/shapes:/app/app/data/gtfs/shapes
 
     frontend:
         build:

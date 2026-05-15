@@ -1,11 +1,15 @@
 import React from "react";
+import { useMapSelectionContext } from "~/context/mapSelectionContext";
+import InfoBoxTrainView from "./InfoBoxTrainView";
+import InfoBoxStationView from "./InfoBoxStationView";
+import InfoBoxUnionView from "./InfoBoxUnionView";
 
-type InfoBoxProps = {
-    isActive: boolean;
-    onToggle: () => void;
-};
+type InfoBoxProps = {};
 
-export default function InfoBox({ isActive, onToggle }: InfoBoxProps) {
+export default function InfoBox(_: InfoBoxProps) {
+    const { selected, clearSelection } = useMapSelectionContext();
+    const isActive = selected !== null;
+
     return (
         <aside
             className={`fixed z-50 h-auto w-screen rounded-t-md border border-neutral-700 bg-neutral-900/95 p-4 text-neutral-100 shadow-xl transition-transform duration-300 ease-in-out md:left-0 md:top-0 md:h-screen md:w-80 md:rounded-none ${
@@ -19,15 +23,26 @@ export default function InfoBox({ isActive, onToggle }: InfoBoxProps) {
                 <h2 className="text-base font-semibold">Info</h2>
                 <button
                     type="button"
-                    onClick={onToggle}
+                    onClick={clearSelection}
                     className="rounded border border-neutral-600 px-2 py-1 text-xs text-neutral-200 hover:bg-neutral-800"
                 >
                     Close
                 </button>
             </div>
-            <p className="text-sm text-neutral-300">
-                Basic info panel content goes here.
-            </p>
+
+            <div className="text-sm text-neutral-300">
+                {selected == null ? (
+                    <div className="text-neutral-400">No selection</div>
+                ) : selected.kind === "train" ? (
+                    <InfoBoxTrainView train={selected.train} />
+                ) : selected.kind === "station" ? (
+                    <InfoBoxStationView station={selected.station} />
+                ) : selected.kind === "union" ? (
+                    <InfoBoxUnionView trains={selected.trainsAtStop} />
+                ) : (
+                    <div />
+                )}
+            </div>
         </aside>
     );
 }

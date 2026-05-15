@@ -7,9 +7,13 @@ import MiniTrainDot from "./MiniTrainDot";
 
 interface UnionStationProps {
     trainsAtStop?: Train[];
+    onSelectUnion?: () => void;
 }
 
-export default function UnionStation({ trainsAtStop = [] }: UnionStationProps) {
+export default function UnionStation({
+    trainsAtStop = [],
+    onSelectUnion,
+}: UnionStationProps) {
     const [activeTrains, setActiveTrains] =
         useState<Train[]>(trainsAtStop);
 
@@ -49,7 +53,7 @@ export default function UnionStation({ trainsAtStop = [] }: UnionStationProps) {
         .join(", ");
 
     return (
-        <g className="group pointer-events-auto">
+        <g className="group pointer-events-auto" onClick={onSelectUnion}>
             <g
                 className="cursor-pointer transition-transform duration-200 ease-out pointer-events-auto group-hover:scale-110"
                 style={{ transformOrigin: `${x}px ${topY + height / 2}px` }}

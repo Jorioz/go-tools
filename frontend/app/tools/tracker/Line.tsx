@@ -1,6 +1,7 @@
 import Station from "./Station";
 import Train from "./Train";
 import type { Train as TrainModel } from "~/models/train";
+import type { StationSelection } from "~/hooks/useMapSelection";
 import {
     buildTrainMarkers,
     type Point,
@@ -36,6 +37,8 @@ interface LineProps {
     };
     showBase?: boolean; // Polyline + Extension + Station Dots + Labels
     showTrains?: boolean;
+    onSelectTrain?: (train: TrainModel) => void;
+    onSelectStation?: (station: StationSelection) => void;
 }
 
 export default function Line({
@@ -50,6 +53,8 @@ export default function Line({
     extension,
     showBase = true,
     showTrains = true,
+    onSelectTrain,
+    onSelectStation,
 }: LineProps) {
     const multipliedPoints: Point[] = points.map(([x, y]) => [x, y]);
 
@@ -76,6 +81,8 @@ export default function Line({
               };
           })()
         : null;
+
+    const extensionStation = extension?.station ?? null;
 
     const pointsString = offsetPoints.map(([x, y]) => `${x} ${y}`).join(" ");
 
@@ -193,17 +200,32 @@ export default function Line({
                             strokeLinejoin="round"
                         />
                     )}
-                    {extensionSegment && extension?.station && (
+                    {extensionSegment && extensionStation && (
                         <Station
                             x={extensionSegment.toX}
                             y={extensionSegment.toY}
                             color={color}
-                            label={extension.station.name}
-                            labelPosition={extension.station.label}
+                            label={extensionStation.name}
+                            labelPosition={extensionStation.label}
                             trainsAtStop={
                                 trainsByStoppedStationName.get(
-                                    extension.station.name,
+                                    extensionStation.name,
                                 ) ?? []
+                            }
+                            onClick={
+                                onSelectStation
+                                    ? () =>
+                                          onSelectStation({
+                                              name: extensionStation.name,
+                                              lineCode,
+                                              x: extensionSegment.toX,
+                                              y: extensionSegment.toY,
+                                              trainsAtStop:
+                                                  trainsByStoppedStationName.get(
+                                                      extensionStation.name,
+                                                  ) ?? [],
+                                          })
+                                    : undefined
                             }
                         />
                     )}
@@ -224,6 +246,21 @@ export default function Line({
                             trainsAtStop={
                                 trainsByStoppedStationName.get(station.name) ??
                                 []
+                            }
+                            onClick={
+                                onSelectStation
+                                    ? () =>
+                                          onSelectStation({
+                                              name: station.name,
+                                              lineCode,
+                                              x: station.x,
+                                              y: station.y,
+                                              trainsAtStop:
+                                                  trainsByStoppedStationName.get(
+                                                      station.name,
+                                                  ) ?? [],
+                                          })
+                                    : undefined
                             }
                         />
                     ))}
@@ -248,6 +285,11 @@ export default function Line({
                             color={markerColor}
                             isVisible={marker.isVisible}
                             overlapAdjustment={marker.overlap}
+                            onClick={
+                                onSelectTrain
+                                    ? () => onSelectTrain(marker.train)
+                                    : undefined
+                            }
                         />
                     );
                 })}

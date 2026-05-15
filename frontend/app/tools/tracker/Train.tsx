@@ -14,6 +14,7 @@ interface TrainProps {
         adjustedY: number;
         scale: number;
     };
+    onClick?: () => void;
 }
 
 export default function Train({
@@ -24,6 +25,7 @@ export default function Train({
     color,
     isVisible = true,
     overlapAdjustment,
+    onClick,
 }: TrainProps) {
     const darkened_color = darken(color);
     const strokeColor = lighten(color);
@@ -95,6 +97,7 @@ export default function Train({
                 transformOrigin: "center center",
                 visibility: "visible",
             }}
+            onClick={onClick}
         >
             <title>
                 {`${train.tripNumber} | ${train.prevStopCode} -> ${train.nextStopCode} | ${Math.round(

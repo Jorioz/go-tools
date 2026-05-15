@@ -1,4 +1,11 @@
-import { useMemo, useRef, useEffect } from "react";
+import {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    type MouseEvent as ReactMouseEvent,
+    type PointerEvent as ReactPointerEvent,
+} from "react";
 import Line from "./Line";
 import UnionStation from "./UnionStation";
 import {
@@ -6,14 +13,21 @@ import {
     TransformComponent,
     useControls,
 } from "react-zoom-pan-pinch";
-import { LINES, type LineCode } from "./utils/constants";
+import { LINES } from "./utils/constants";
 import type { Train, TrainsByLine } from "~/models/train";
+import { useMapSelectionContext } from "~/context/mapSelectionContext";
 
 export default function MapSimple({
     trainsByLine,
 }: {
     trainsByLine: TrainsByLine;
 }) {
+    const {
+        selectTrain,
+        selectStation,
+        selectUnion,
+        clearSelection,
+    } = useMapSelectionContext();
     const unionStoppedTrains = useMemo(
         () =>
             Object.values(trainsByLine)
@@ -27,6 +41,8 @@ export default function MapSimple({
     );
 
     const transformRef = useRef<any>(null);
+    const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
+    const suppressClickRef = useRef(false);
 
     useEffect(() => {
         const updateVh = () => {
@@ -67,6 +83,46 @@ export default function MapSimple({
         };
     }, []);
 
+    const handleBackgroundPointerDown = useCallback(
+        (event: ReactPointerEvent<HTMLDivElement>) => {
+            if (event.button !== 0) return;
+            pointerStartRef.current = {
+                x: event.clientX,
+                y: event.clientY,
+            };
+            suppressClickRef.current = false;
+        },
+        [],
+    );
+
+    const handleBackgroundPointerMove = useCallback(
+        (event: ReactPointerEvent<HTMLDivElement>) => {
+            if (!pointerStartRef.current) return;
+            const dx = event.clientX - pointerStartRef.current.x;
+            const dy = event.clientY - pointerStartRef.current.y;
+            if (Math.hypot(dx, dy) > 6) {
+                suppressClickRef.current = true;
+            }
+        },
+        [],
+    );
+
+    const handleBackgroundPointerUp = useCallback(() => {
+        pointerStartRef.current = null;
+    }, []);
+
+    const handleBackgroundClick = useCallback(
+        (event: ReactMouseEvent<HTMLDivElement>) => {
+            if (event.target !== event.currentTarget) return;
+            if (suppressClickRef.current) {
+                suppressClickRef.current = false;
+                return;
+            }
+            clearSelection();
+        },
+        [clearSelection],
+    );
+
     return (
         <div className="w-full flex-1 bg-neutral-300 flex justify-center items-center px-10">
             <TransformWrapper
@@ -96,6 +152,10 @@ export default function MapSimple({
                             margin: "0 auto",
                             position: "relative",
                         }}
+                        onPointerDown={handleBackgroundPointerDown}
+                        onPointerMove={handleBackgroundPointerMove}
+                        onPointerUp={handleBackgroundPointerUp}
+                        onClick={handleBackgroundClick}
                     >
                         {/* Map #1 draws out the Lines, no Trains */}
                         {LINES.map((line) => (
@@ -114,6 +174,8 @@ export default function MapSimple({
                                     extension={line.extension}
                                     showTrains={false}
                                     showBase={true}
+                                    onSelectTrain={selectTrain}
+                                    onSelectStation={selectStation}
                                 />
                             </div>
                         ))}
@@ -130,6 +192,9 @@ export default function MapSimple({
                                 >
                                     <UnionStation
                                         trainsAtStop={unionStoppedTrains}
+                                        onSelectUnion={() =>
+                                            selectUnion(unionStoppedTrains)
+                                        }
                                     />
                                 </svg>
                             </div>
@@ -151,6 +216,8 @@ export default function MapSimple({
                                     extension={line.extension}
                                     showTrains={true}
                                     showBase={false}
+                                    onSelectTrain={selectTrain}
+                                    onSelectStation={selectStation}
                                 />
                             </div>
                         ))}

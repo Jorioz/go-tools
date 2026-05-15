@@ -21,6 +21,7 @@ export default function Station({
     color,
     label,
     labelPosition = "top",
+    onClick,
     trainsAtStop = [],
 }: StationProps) {
     const activeTrains = trainsAtStop;
@@ -75,7 +76,7 @@ export default function Station({
     const miniDotStroke = lighten(color, 0.15);
 
     return (
-        <g className="group pointer-events-auto">
+        <g className="group pointer-events-auto" onClick={onClick}>
             <g
                 className="cursor-pointer transition-transform duration-200 ease-out pointer-events-auto group-hover:scale-250"
                 style={{ transformOrigin: `${x}px ${y}px` }}

@@ -123,6 +123,10 @@ export const getStopName = (lineCode: string, stopCode: string): string => {
     }
     return stops[normalizedStop] ?? normalizedStop;
 };
+export const DIRECTION_LABELS: Record<number, string> = {
+    0: "Inbound",
+    1: "Outbound",
+};
 
 interface LineExtension {
     fromPointIndex: number;

@@ -23,11 +23,13 @@ export default function MapSimple({
     trainsByLine: TrainsByLine;
 }) {
     const {
+        selected,
         selectTrain,
         selectStation,
         selectUnion,
         clearSelection,
     } = useMapSelectionContext();
+    const selectedTrain = selected?.kind === "train" ? selected.train : null;
     const unionStoppedTrains = useMemo(
         () =>
             Object.values(trainsByLine)
@@ -176,6 +178,8 @@ export default function MapSimple({
                                     showBase={true}
                                     onSelectTrain={selectTrain}
                                     onSelectStation={selectStation}
+                                    selectedTrain={selectedTrain}
+                                    showSelectionOverlay={true}
                                 />
                             </div>
                         ))}
@@ -218,6 +222,8 @@ export default function MapSimple({
                                     showBase={false}
                                     onSelectTrain={selectTrain}
                                     onSelectStation={selectStation}
+                                    selectedTrain={selectedTrain}
+                                    showSelectionOverlay={false}
                                 />
                             </div>
                         ))}

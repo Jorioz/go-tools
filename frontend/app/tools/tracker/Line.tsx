@@ -3,6 +3,11 @@ import Train from "./Train";
 import type { Train as TrainModel } from "~/models/train";
 import type { StationSelection } from "~/hooks/useMapSelection";
 import {
+    buildSelectedRoute,
+    getTrainSelectionKey,
+    type SelectedRoute,
+} from "./utils/selectionRoute";
+import {
     buildTrainMarkers,
     type Point,
     type StopAnchor,
@@ -37,6 +42,8 @@ interface LineProps {
     };
     showBase?: boolean; // Polyline + Extension + Station Dots + Labels
     showTrains?: boolean;
+    selectedTrain?: TrainModel | null;
+    showSelectionOverlay?: boolean;
     onSelectTrain?: (train: TrainModel) => void;
     onSelectStation?: (station: StationSelection) => void;
 }
@@ -53,6 +60,8 @@ export default function Line({
     extension,
     showBase = true,
     showTrains = true,
+    selectedTrain = null,
+    showSelectionOverlay = false,
     onSelectTrain,
     onSelectStation,
 }: LineProps) {
@@ -175,6 +184,21 @@ export default function Line({
         extensionSegment,
     });
 
+    const selectedRoute: SelectedRoute | null =
+        showSelectionOverlay && selectedTrain?.lineCode === lineCode
+            ? buildSelectedRoute(selectedTrain)
+            : null;
+    const highlightedPointsString = selectedRoute
+        ? selectedRoute.highlightedPoints
+              .map(([x, y]) => `${x} ${y + yOffset}`)
+              .join(" ")
+        : null;
+    const dimmedPointsString = selectedRoute
+        ? selectedRoute.dimmedPoints
+              .map(([x, y]) => `${x} ${y + yOffset}`)
+              .join(" ")
+        : null;
+
     const stoppedOnTrackColor = "#e0c761";
 
     return (
@@ -188,14 +212,38 @@ export default function Line({
                 <>
                     <polyline
                         points={pointsString}
-                        className={`fill-none ${strokeClass} pointer-events-none`}
+                        className={`fill-none ${strokeClass} pointer-events-none ${selectedRoute ? "opacity-20" : ""}`}
                         strokeLinecap="round"
                         strokeLinejoin="round"
                     />
+                    {selectedRoute &&
+                        dimmedPointsString &&
+                        dimmedPointsString.length > 0 && (
+                            <polyline
+                                points={dimmedPointsString}
+                                className="fill-none pointer-events-none"
+                                stroke={color}
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="140"
+                                opacity="0.35"
+                            />
+                        )}
+                    {selectedRoute && highlightedPointsString && (
+                        <polyline
+                            points={highlightedPointsString ?? ""}
+                            className="fill-none pointer-events-none"
+                            stroke={color}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="140"
+                            opacity="0.95"
+                        />
+                    )}
                     {extensionSegment && (
                         <polyline
                             points={extensionSegment.pointsString}
-                            className={`fill-none ${strokeClass} pointer-events-none`}
+                            className={`fill-none ${strokeClass} pointer-events-none ${selectedRoute ? "opacity-20" : ""}`}
                             strokeLinecap="round"
                             strokeLinejoin="round"
                         />
@@ -274,6 +322,12 @@ export default function Line({
                     const markerColor = isStoppedOnTrack
                         ? stoppedOnTrackColor
                         : color;
+                    const isSelectedTrain =
+                        selectedTrain !== null &&
+                        getTrainSelectionKey(marker.train) ===
+                            getTrainSelectionKey(selectedTrain);
+                    const isDimmedTrain =
+                        selectedTrain !== null && !isSelectedTrain;
 
                     return (
                         <Train
@@ -283,6 +337,8 @@ export default function Line({
                             y={marker.y}
                             angleDeg={marker.angleDeg}
                             color={markerColor}
+                            isSelected={isSelectedTrain}
+                            isDimmed={isDimmedTrain}
                             isVisible={marker.isVisible}
                             overlapAdjustment={marker.overlap}
                             onClick={

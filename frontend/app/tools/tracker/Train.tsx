@@ -8,6 +8,8 @@ interface TrainProps {
     y: number;
     angleDeg: number;
     color: string;
+    isSelected?: boolean;
+    isDimmed?: boolean;
     isVisible?: boolean;
     overlapAdjustment?: {
         adjustedX: number;
@@ -23,6 +25,8 @@ export default function Train({
     y,
     angleDeg,
     color,
+    isSelected = false,
+    isDimmed = false,
     isVisible = true,
     overlapAdjustment,
     onClick,
@@ -41,7 +45,7 @@ export default function Train({
               y: adjustedY,
               rotate: angleDeg,
               scale: adjustedScale,
-              opacity: 1,
+              opacity: isDimmed ? 0.22 : 1,
               transitionEnd: { visibility: "visible" as const },
           }
         : {
@@ -104,6 +108,16 @@ export default function Train({
                     train.progress * 100,
                 )}%`}
             </title>
+            {isSelected && (
+                <polygon
+                    points={markerPoints}
+                    fill="none"
+                    stroke="#facc15"
+                    strokeWidth="92"
+                    strokeLinejoin="round"
+                    className="opacity-75"
+                />
+            )}
             <polygon
                 points={markerPoints}
                 className="stroke-black/25"

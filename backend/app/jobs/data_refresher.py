@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
-from datetime import datetime
-from typing import Dict, List
+from datetime import datetime, timedelta
+from typing import Callable, Dict, List
 import threading
 import time
 
@@ -23,8 +23,20 @@ class Snapshot:
     last_updated: datetime | None = None
 
 
+# A served snapshot is discarded once its age exceeds this many refresh
+# intervals. At the current 15s interval that is 120s -- deliberately matching
+# the completed-train TTL in TrainManager -- but it is expressed as a multiple of
+# the configured interval so it scales automatically if that interval changes.
+STALE_AFTER_CYCLES = 8
+
+
 class DataRefresher():
-    def __init__(self, refresh_interval, manager: LineManager | None = None):
+    def __init__(
+        self,
+        refresh_interval,
+        manager: LineManager | None = None,
+        now: Callable[[], datetime] = datetime.now,
+    ):
         self.refresh_interval = refresh_interval
         # The single published snapshot. Reads resolve this reference lock-free;
         # a successful cycle swaps in a brand-new Snapshot.
@@ -35,6 +47,16 @@ class DataRefresher():
         # Injection seam: tests pass a LineManager wired to a fake feed so they can
         # drive refresh() directly without a real service, an API key, or a thread.
         self.manager = manager if manager is not None else LineManager()
+        # Injection seam for time. Used both to stamp snapshots in refresh() and to
+        # judge staleness on the read path, so tests can advance a fake clock to
+        # cross the cutoff without sleeping. Defaults to datetime.now (production
+        # behavior unchanged).
+        self._now = now
+
+    @property
+    def _stale_after(self) -> timedelta:
+        """How old a snapshot may get before its states are treated as expired."""
+        return timedelta(seconds=self.refresh_interval * STALE_AFTER_CYCLES)
 
     def start(self):
         self._thread.start()
@@ -63,23 +85,41 @@ class DataRefresher():
                 line_code: self.manager.get_train_states_for_line(line_code)
                 for line_code in LINE_CODES
             }
-            now = datetime.now()
+            now = self._now()
             new_snapshot = Snapshot(states_by_line=states_by_line, last_updated=now)
             with self._lock:
                 self._snapshot = new_snapshot
             print(f"[{now.strftime('%Y-%m-%d %H:%M:%S')}] Data refresh completed")
         except MetrolinxFeedError as exc:
-            now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            now = self._now().strftime('%Y-%m-%d %H:%M:%S')
             print(f"[{now}] WARNING - Data refresh failed, keeping previous cache: {exc}")
 
     @property
     def last_updated(self) -> datetime | None:
         # Read from the currently published snapshot so the timestamp always
-        # matches the states served alongside it.
+        # matches the states served alongside it. This stays truthful even once
+        # the snapshot's states have expired: it reports the real timestamp of the
+        # last successful refresh so the X-Last-Updated header (and a future
+        # frontend staleness indicator) can be honest about the data's age.
         return self._snapshot.last_updated
+
+    def _is_stale(self, snapshot: Snapshot) -> bool:
+        # A snapshot with no timestamp (nothing has refreshed yet) is not "stale"
+        # in the outlived-its-cutoff sense; it just has no data to expire.
+        if snapshot.last_updated is None:
+            return False
+        return self._now() - snapshot.last_updated > self._stale_after
 
     def get_states(self, line_code):
         # Resolve the current snapshot reference once (a lock-free atomic read),
         # then work with that consistent view.
+        #
+        # Read-path staleness expiry: once the snapshot has outlived the cutoff we
+        # serve empty lists rather than misleading stale positions. The decision is
+        # made here, purely from the snapshot's own timestamp, so it holds even if
+        # the refresh loop is wedged on a hung connection or dead from an
+        # unanticipated exception -- exactly the scenario this defends against.
         snapshot = self._snapshot
+        if self._is_stale(snapshot):
+            return []
         return snapshot.states_by_line.get(line_code, [])

@@ -78,7 +78,11 @@ def test_unknown_line_code_skipped_and_logged_once_across_cycles(caplog) -> None
     assert _trips(refresher) == {"1001"}
 
     refresher.refresh()
-    assert _trips(refresher) == {"1002"}
+    # 1001 is absent from cycle 2 but carried forward one cycle by the dropout
+    # grace (issue #12), so both the freshly mapped 1002 and the grace-held 1001
+    # are served. The point of this test -- log-once for the unknown code -- is
+    # unaffected.
+    assert _trips(refresher) == {"1001", "1002"}
 
     # The unsupported-code message is emitted exactly once despite UP trains in
     # both cycles -- per-cycle repetition would train people to ignore warnings.
@@ -115,7 +119,10 @@ def test_all_class_b_escalates_and_retains_previous_snapshot() -> None:
 def test_only_unknown_line_codes_is_a_successful_empty_cycle() -> None:
     # Cycle 1 seeds a normal snapshot. Cycle 2 carries ONLY UP Express trains:
     # zero mapped, zero Class B errors -> a legitimate empty success, NOT an
-    # escalation. The cache empties and a fresh snapshot is published.
+    # escalation. A fresh snapshot is published and the timestamp advances (an
+    # escalation would instead freeze both). Because this cycle SUCCEEDS, the
+    # missing-trip handling runs and 1001 -- absent this cycle -- is carried
+    # forward by the dropout grace (issue #12) rather than dropped instantly.
     refresher = _make_refresher(
         [[make_train("1001")], [_up_express_train("7001"), _up_express_train("7002")]]
     )
@@ -127,9 +134,11 @@ def test_only_unknown_line_codes_is_a_successful_empty_cycle() -> None:
 
     refresher.refresh()
 
-    # Success serving empty states: a new snapshot, timestamp advanced.
+    # Success: a new snapshot, timestamp advanced (contrast with escalation, which
+    # keeps the previous snapshot object and freezes the timestamp). 1001 lingers
+    # via grace, evidence the successful missing-trip path ran.
     assert refresher._snapshot is not snapshot_after_success
-    assert refresher.get_states(LINE_CODES.MILTON) == []
+    assert _trips(refresher) == {"1001"}
     assert refresher.last_updated is not None
     assert refresher.last_updated >= last_updated_after_success
 

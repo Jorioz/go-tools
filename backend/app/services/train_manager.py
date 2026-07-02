@@ -13,6 +13,15 @@ from app.models.line import Line, LineStop
 logger = logging.getLogger(__name__)
 
 
+# A live (non-completed) train absent from an otherwise-successful cycle is
+# carried forward unchanged for this many consecutive missed cycles before being
+# dropped. Counting in cycles (rather than wall-clock) makes the grace scale with
+# whatever refresh interval is configured -- two missed refreshes are two missed
+# refreshes at 15s or 60s. Convention: misses 1 and 2 are still served; the 3rd
+# consecutive miss drops the trip.
+MISSING_GRACE_CYCLES = 2
+
+
 class NoTrainsMappedError(MetrolinxFeedError):
     """Raised when a non-empty feed maps zero trains yet at least one record hit a
     Class B mapping error (parse/geometry failure).
@@ -63,6 +72,11 @@ class TrainManager:
         self.line_contexts = line_contexts
         self.lw_route_contexts = lw_route_contexts or {}
         self.states: dict[str, TrainState] = {}
+        # Consecutive missed-cycle counts per trip, for the dropout grace window.
+        # A trip appears here only while it is being carried forward through its
+        # grace (absent from the feed but not yet dropped); it is cleared the
+        # moment the trip reappears or is finally dropped.
+        self._missed_cycles: dict[str, int] = {}
         self._ttl_ms = 120000
         # Unknown line codes (e.g. UP Express reporting as "UP") appear every
         # cycle forever, so we log each one only on its first sighting for the
@@ -75,7 +89,14 @@ class TrainManager:
         prev_states = dict(self.states)
         found_trip_numbers = {train.trip_number for train in trains if train.trip_number}
 
-        self.states = {}
+        # Build this cycle's map into a fresh local dict and only publish it to
+        # self.states once the cycle has fully succeeded. If escalation raises
+        # below, self.states (and the missed-cycle counters) are left exactly as
+        # the previous cycle produced them -- one bad cycle never wipes the
+        # manager's cross-cycle memory. _upsert_one reads existing state from
+        # prev_states (last cycle) so a carried-forward or updated train's segment
+        # memory survives; it never read the always-empty new map.
+        new_states: dict[str, TrainState] = {}
         # Per-record isolation: one bad record must never abort the whole cycle.
         # Two failure classes, handled differently:
         #   * Class A -- unknown line code (deliberately unmodeled service): skip,
@@ -88,7 +109,7 @@ class TrainManager:
                 self._note_unknown_line_code(train.line_code)
                 continue
             try:
-                self._upsert_one(train)
+                self._upsert_one(train, prev_states, new_states)
             except Exception as exc:
                 class_b_errors += 1
                 logger.warning(
@@ -102,9 +123,11 @@ class TrainManager:
         # failed cycle, not "no trains running". Fail loudly so DataRefresher keeps
         # the previous snapshot instead of emptying the served cache. Unknown-code
         # skips do NOT count -- a feed of only unmodeled services is a legitimate
-        # empty success. len(self.states) here is exactly this cycle's live map
-        # count (states was reset above; missing-trip re-adds happen below).
-        if trains and len(self.states) == 0 and class_b_errors > 0:
+        # empty success. len(new_states) here is exactly this cycle's live map
+        # count (carried-forward and completed-afterlife re-adds happen below and
+        # must NOT count as "mapped"). Raising here leaves self.states and the
+        # grace counters untouched, so an escalated cycle consumes nobody's grace.
+        if trains and len(new_states) == 0 and class_b_errors > 0:
             raise NoTrainsMappedError(
                 f"Feed delivered {len(trains)} trip(s) but mapped 0 trains with "
                 f"{class_b_errors} mapping error(s); treating cycle as failed."
@@ -113,14 +136,39 @@ class TrainManager:
         missing_trip_numbers = set(prev_states.keys()) - found_trip_numbers
         for trip_number in missing_trip_numbers:
             state = prev_states[trip_number]
-            # verify that missing train could have finished its route, or warn if no longer getting update
-            if not self._is_completed_state(state) and not self._is_implied_completed(state):
-                print(f"WARNING - Missing trip: {trip_number} on new cycle. State not updated.")
+            # Completed / implied-completed trains keep their existing TTL
+            # afterlife, untouched by the live-train grace window: they linger as a
+            # completed marker for _ttl_ms past their modified_date.
+            if self._is_completed_state(state) or self._is_implied_completed(state):
+                self._missed_cycles.pop(trip_number, None)
+                completed_state = self._get_completed_state(state)
+                if self._age_ms(completed_state.modified_date, now) <= self._ttl_ms:
+                    new_states[trip_number] = completed_state
                 continue
-            
-            completed_state = self._get_completed_state(state)
-            if self._age_ms(completed_state.modified_date, now) <= self._ttl_ms:
-                self.states[trip_number] = completed_state
+
+            # Live train absent from this successful cycle: carry it forward
+            # unchanged (the frozen state object is safe to reuse) for a short grace
+            # window, so a one-cycle feed flicker causes no visual dropout or
+            # segment snap on reappearance. Drop it only once the grace is spent.
+            missed = self._missed_cycles.get(trip_number, 0) + 1
+            if missed > MISSING_GRACE_CYCLES:
+                logger.info(
+                    "Trip %s not seen for %d cycles, removing",
+                    trip_number,
+                    MISSING_GRACE_CYCLES,
+                )
+                self._missed_cycles.pop(trip_number, None)
+                continue
+            self._missed_cycles[trip_number] = missed
+            new_states[trip_number] = state
+
+        # A trip present in the feed this cycle is back on track: clear any grace
+        # counter so its next disappearance starts a fresh window.
+        for trip_number in found_trip_numbers:
+            self._missed_cycles.pop(trip_number, None)
+
+        # Publish this cycle's map in one assignment (the successful-cycle commit).
+        self.states = new_states
 
     def _init_state(self, train: GoTrain, line_code: LINE_CODES, direction: Direction, prev_stop_code: str, next_stop_code: str, progress: float, stopped_at_stop_code: str) -> TrainState:
         return TrainState(
@@ -169,13 +217,17 @@ class TrainManager:
         self._unknown_line_codes_seen.add(line_code)
         logger.warning("Ignoring unsupported line code %s", line_code)
 
-    def _upsert_one(self, train: GoTrain) -> None:
+    def _upsert_one(self, train: GoTrain, prev_states: dict[str, TrainState], new_states: dict[str, TrainState]) -> None:
         line_code = LINE_CODES(train.line_code)
         line = self._resolve_line_context(train, line_code)
         if line is None:
             return
         direction = self._get_direction(train.first_stop_code)
-        existing = self.states.get(train.trip_number)
+        # Consult the PREVIOUS cycle's state so an update path (and _try_keep_segment
+        # within _find_prev_next) actually fires across cycles -- including for a
+        # train that was carried forward through the grace window and is now
+        # reappearing, whose prior state lives in prev_states.
+        existing = prev_states.get(train.trip_number)
 
         train_point = Point(float(train.longitude), float(train.latitude))
         projected = line.linestring.interpolate(line.linestring.project(train_point))
@@ -250,7 +302,7 @@ class TrainManager:
                 stopped_at_stop_code=stopped_at_stop_code,
             )
 
-        self.states[train.trip_number] = existing
+        new_states[train.trip_number] = existing
 
     def _resolve_line_context(self, train: GoTrain, line_code: LINE_CODES) -> Line | None:
         default_line = self.line_contexts.get(line_code)

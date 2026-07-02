@@ -1,7 +1,7 @@
 from enum import Enum
 from datetime import datetime
 from shapely import Point
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from app.services.metrolinx_service import GoTrain
 from app.utils.geometry import progress_between_points
@@ -13,7 +13,11 @@ class Direction(Enum):
     TO_UNION = 0
     FROM_UNION = 1
 
-@dataclass
+# Frozen so a published state object can never be mutated after a reader holds
+# it: updates go through dataclasses.replace() to produce a fresh object, which
+# rules out torn reads (e.g. a new latitude paired with an old progress) at the
+# type level.
+@dataclass(frozen=True)
 class TrainState:
     #static
     trip_number: str
@@ -83,15 +87,19 @@ class TrainManager:
         )
 
     def _update_state(self, state: TrainState, prev_stop_code: str, next_stop_code: str, latitude: float, longitude: float, progress: float, in_motion: bool, modified_date: str, stopped_at_stop_code: str) -> TrainState:
-        state.prev_stop_code = prev_stop_code
-        state.next_stop_code = next_stop_code
-        state.latitude = latitude
-        state.longitude = longitude
-        state.progress = progress
-        state.in_motion = in_motion
-        state.modified_date = self._parse_datetime(modified_date)
-        state.stopped_at_stop_code = stopped_at_stop_code
-        return state
+        # Copy-on-write: return a fresh TrainState rather than mutating the one
+        # passed in, which may still be reachable by an API reader serializing it.
+        return replace(
+            state,
+            prev_stop_code=prev_stop_code,
+            next_stop_code=next_stop_code,
+            latitude=latitude,
+            longitude=longitude,
+            progress=progress,
+            in_motion=in_motion,
+            modified_date=self._parse_datetime(modified_date),
+            stopped_at_stop_code=stopped_at_stop_code,
+        )
 
     def _upsert_one(self, train: GoTrain) -> None:
         line_code = LINE_CODES(train.line_code)
@@ -195,14 +203,21 @@ class TrainManager:
         return is_approaching_dest and (state.progress >= threshold)
 
     def _get_completed_state(self, state: TrainState) -> TrainState:
+        # Copy-on-write: `state` here is a *previous-cycle* object still reachable
+        # by readers via the prior snapshot, so we must not mutate it. Build a
+        # fresh completed state instead.
+        modified_date = state.modified_date
         if not self._is_completed_state(state):
-            state.modified_date = datetime.now() # capture modified date one final time
-        state.prev_stop_code = state.last_stop_code
-        state.next_stop_code = state.last_stop_code
-        state.progress = 1.0
-        state.in_motion = False
-        state.stopped_at_stop_code = state.last_stop_code
-        return state
+            modified_date = datetime.now() # capture modified date one final time
+        return replace(
+            state,
+            prev_stop_code=state.last_stop_code,
+            next_stop_code=state.last_stop_code,
+            progress=1.0,
+            in_motion=False,
+            stopped_at_stop_code=state.last_stop_code,
+            modified_date=modified_date,
+        )
     
     def _is_completed_state(self, state: TrainState) -> bool:
         return (

@@ -8,6 +8,20 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime
 
 
+class MetrolinxFeedError(Exception):
+    """Raised when the GO feed cannot be fetched or its envelope is malformed.
+
+    Covers every failure mode of a feed cycle: network error, non-200 response,
+    malformed JSON, or an unexpected envelope shape (missing/mis-typed ``Trips``
+    container, or a ``Trip`` value that is neither a list nor a dict). It is
+    deliberately distinct so the refresher can catch feed failures precisely and
+    leave its cache untouched, rather than treating an outage as "no trains".
+
+    Note: a well-formed envelope with an empty or absent ``Trip`` list is a
+    *success* (returns ``[]``), not a feed error -- GO trains stop overnight.
+    """
+
+
 @dataclass
 class GoTrain:
     cars: str
@@ -77,7 +91,6 @@ class MetrolinxService:
             )
         self.trains: List[GoTrain] = []
         self.last_updated: Optional[datetime] = None
-        self._map_trains()
 
     def _fetch(self, endpoint: str):
         BASE_URL = "https://api.openmetrolinx.com/OpenDataAPI"
@@ -89,63 +102,59 @@ class MetrolinxService:
             response = requests.get(url, headers=headers, timeout=10)
             response.raise_for_status()
             return response.json()
-        except requests.RequestException as req_err:
-            raise RuntimeError(f"Failed to fetch GO API Data: {req_err}")
+        except (requests.RequestException, ValueError) as fetch_err:
+            # RequestException covers network errors and non-200 responses;
+            # ValueError covers malformed JSON (requests' JSONDecodeError).
+            raise MetrolinxFeedError(f"Failed to fetch GO API data: {fetch_err}") from fetch_err
 
     def _fetch_sag_trains(self, endpoint = "api/V1/ServiceataGlance/Trains/All") -> List[Dict[str, Any]]:
-        try:
-            data = self._fetch(endpoint)
-            if not isinstance(data, dict):
-                return []
+        data = self._fetch(endpoint)
+        if not isinstance(data, dict):
+            raise MetrolinxFeedError(f"Unexpected feed envelope: expected a dict, got {type(data).__name__}")
 
-            trips_container = data.get("Trips") or {}
-            if not isinstance(trips_container, dict):
-                return []
+        if "Trips" not in data:
+            raise MetrolinxFeedError("Unexpected feed envelope: missing 'Trips' container")
 
-            trips = trips_container.get("Trip", [])
-            if trips is None:
-                return []
-
-            if isinstance(trips, list):
-                return [trip for trip in trips if isinstance(trip, dict)]
-
-            if isinstance(trips, dict):
-                return [trips]
-
+        trips_container = data["Trips"]
+        # An empty/absent Trips container is a legitimate "no trains" success.
+        if trips_container is None:
             return []
-        except RuntimeError as fetch_err:
-            print(f"Error getting SAG Trains Data. See Fetch Error -> {fetch_err}")
+        if not isinstance(trips_container, dict):
+            raise MetrolinxFeedError(
+                f"Unexpected feed envelope: 'Trips' is {type(trips_container).__name__}, expected a dict"
+            )
+
+        # A well-formed envelope with an absent or empty 'Trip' is a success (no
+        # trains running), returning []. Only a mis-typed 'Trip' is shape drift.
+        trips = trips_container.get("Trip", [])
+        if trips is None:
             return []
+
+        if isinstance(trips, list):
+            return [trip for trip in trips if isinstance(trip, dict)]
+
+        if isinstance(trips, dict):
+            return [trips]
+
+        raise MetrolinxFeedError(
+            f"Unexpected feed envelope: 'Trip' is {type(trips).__name__}, expected a list or dict"
+        )
 
     def _map_trains(self):
         trips = self._fetch_sag_trains()
-        if not trips:
-            self.trains = []
-            return
         self.trains = [GoTrain.from_dict(trip) for trip in trips]
         self.last_updated = datetime.now()
 
     def get_train_data(self) -> List[GoTrain]:
-        try:
-            print("Attemping to get live train data...")
-            self._map_trains()
-            print("Got Trains!")
-            return self.trains
-        except RuntimeError as e:
-            print(f"Error getting trains: {e}")
-            return []
-        
+        """Fetch and return the current live trains.
+
+        Raises :class:`MetrolinxFeedError` on any fetch or parse failure. A
+        well-formed feed with no trains returns an empty list (a success).
+        """
+        self._map_trains()
+        return self.trains
+
     def get_last_updated(self) -> Optional[datetime]:
-        try:
-            print("Attemping to get last updated train data...")
-            if not self.last_updated:
-                print("Last updated is empty.")
-                return None
-            print("Got last updated train data!")
-            return self.last_updated
-        except LookupError as e:
-            print(f"Error getting last updated train data: {e}")
-            return None
-        
-    
+        return self.last_updated
+
 

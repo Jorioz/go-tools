@@ -4,6 +4,7 @@ import threading
 import time
 
 from app.services.line_manager import LineManager
+from app.services.metrolinx_service import MetrolinxFeedError
 from app.constants import LINE_CODES
 from app.services.train_manager import TrainState
 
@@ -33,6 +34,10 @@ class DataRefresher():
             time.sleep(self.refresh_interval)
     
     def refresh(self):
+        # Single catch point for feed failures. A failed cycle keeps the existing
+        # cache and last_updated exactly as they were, so an outage is never
+        # confused with "no trains running". A successful cycle -- including a
+        # legitimately empty feed -- updates the cache and advances last_updated.
         try:
             with self._lock:
                 self.manager.refresh_trains()
@@ -40,16 +45,9 @@ class DataRefresher():
                     self._cache[line_code] = self.manager.get_train_states_for_line(line_code)
                 self.last_updated = datetime.now()
                 print(f"[{self.last_updated.strftime('%Y-%m-%d %H:%M:%S')}] Data refresh completed")
-        except Exception as exc:
-            with self._lock:
-                for line_code in LINE_CODES:
-                    self._cache[line_code] = []
-
-            if isinstance(exc, TypeError) and "NoneType" in str(exc) and "subscriptable" in str(exc):
-                return
-
+        except MetrolinxFeedError as exc:
             now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            print(f"[{now}] WARNING - Data refresh failed: {exc}")
+            print(f"[{now}] WARNING - Data refresh failed, keeping previous cache: {exc}")
 
     def get_states(self, line_code):
         with self._lock:

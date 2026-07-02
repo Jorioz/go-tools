@@ -7,7 +7,7 @@ import time
 from app.services.line_manager import LineManager
 from app.services.metrolinx_service import MetrolinxFeedError
 from app.constants import LINE_CODES
-from app.services.train_manager import TrainState
+from app.services.train_manager import TrainState, NoTrainsMappedError
 
 
 @dataclass(frozen=True)
@@ -90,6 +90,13 @@ class DataRefresher():
             with self._lock:
                 self._snapshot = new_snapshot
             print(f"[{now.strftime('%Y-%m-%d %H:%M:%S')}] Data refresh completed")
+        except NoTrainsMappedError as exc:
+            # Escalated schema-drift failure: a non-empty feed mapped zero trains
+            # because records failed to map. Treated exactly like a feed outage --
+            # keep the previous snapshot, do not advance last_updated -- but logged
+            # distinctly since the cause is our mapping, not the feed.
+            now = self._now().strftime('%Y-%m-%d %H:%M:%S')
+            print(f"[{now}] WARNING - Data refresh mapped no trains, keeping previous cache: {exc}")
         except MetrolinxFeedError as exc:
             now = self._now().strftime('%Y-%m-%d %H:%M:%S')
             print(f"[{now}] WARNING - Data refresh failed, keeping previous cache: {exc}")

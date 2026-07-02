@@ -1,12 +1,32 @@
+import logging
 from enum import Enum
 from datetime import datetime
 from shapely import Point
 from dataclasses import dataclass, replace
 
-from app.services.metrolinx_service import GoTrain
+from app.services.metrolinx_service import GoTrain, MetrolinxFeedError
 from app.utils.geometry import progress_between_points
 from app.constants import LINE_CODES
 from app.models.line import Line, LineStop
+
+
+logger = logging.getLogger(__name__)
+
+
+class NoTrainsMappedError(MetrolinxFeedError):
+    """Raised when a non-empty feed maps zero trains yet at least one record hit a
+    Class B mapping error (parse/geometry failure).
+
+    This is the schema-drift guard: if a Metrolinx envelope change breaks the
+    mapping of every record, the cycle would otherwise look like a legitimate "no
+    trains running" and silently empty the served cache. Subclassing
+    ``MetrolinxFeedError`` lets ``DataRefresher`` treat such a cycle exactly like a
+    feed outage -- keep the previous snapshot, do not advance ``last_updated`` --
+    while remaining a distinct type the refresher can catch precisely.
+
+    A non-empty feed of *only* unknown line codes (zero mapped, zero Class B
+    errors) is NOT this error: unmodeled services are a successful empty cycle.
+    """
 
 
 class Direction(Enum):
@@ -44,6 +64,11 @@ class TrainManager:
         self.lw_route_contexts = lw_route_contexts or {}
         self.states: dict[str, TrainState] = {}
         self._ttl_ms = 120000
+        # Unknown line codes (e.g. UP Express reporting as "UP") appear every
+        # cycle forever, so we log each one only on its first sighting for the
+        # lifetime of this manager -- per-cycle repetition would just train people
+        # to ignore warnings.
+        self._unknown_line_codes_seen: set[str] = set()
 
     def upsert_many(self, trains: list[GoTrain]) -> None:
         now = datetime.now()
@@ -51,9 +76,39 @@ class TrainManager:
         found_trip_numbers = {train.trip_number for train in trains if train.trip_number}
 
         self.states = {}
-        # Update live trains
+        # Per-record isolation: one bad record must never abort the whole cycle.
+        # Two failure classes, handled differently:
+        #   * Class A -- unknown line code (deliberately unmodeled service): skip,
+        #     logged once per code (see _note_unknown_line_code).
+        #   * Class B -- any other error raised while mapping (parse/geometry):
+        #     skip, warn per occurrence with the trip number.
+        class_b_errors = 0
         for train in trains:
-            self._upsert_one(train)
+            if not self._is_known_line_code(train.line_code):
+                self._note_unknown_line_code(train.line_code)
+                continue
+            try:
+                self._upsert_one(train)
+            except Exception as exc:
+                class_b_errors += 1
+                logger.warning(
+                    "Skipping trip %s due to mapping error: %s",
+                    train.trip_number,
+                    exc,
+                )
+
+        # Escalation guard against schema drift: a non-empty feed that mapped zero
+        # trains *because* records failed to map (at least one Class B error) is a
+        # failed cycle, not "no trains running". Fail loudly so DataRefresher keeps
+        # the previous snapshot instead of emptying the served cache. Unknown-code
+        # skips do NOT count -- a feed of only unmodeled services is a legitimate
+        # empty success. len(self.states) here is exactly this cycle's live map
+        # count (states was reset above; missing-trip re-adds happen below).
+        if trains and len(self.states) == 0 and class_b_errors > 0:
+            raise NoTrainsMappedError(
+                f"Feed delivered {len(trains)} trip(s) but mapped 0 trains with "
+                f"{class_b_errors} mapping error(s); treating cycle as failed."
+            )
 
         missing_trip_numbers = set(prev_states.keys()) - found_trip_numbers
         for trip_number in missing_trip_numbers:
@@ -100,6 +155,19 @@ class TrainManager:
             modified_date=self._parse_datetime(modified_date),
             stopped_at_stop_code=stopped_at_stop_code,
         )
+
+    def _is_known_line_code(self, line_code: str) -> bool:
+        try:
+            LINE_CODES(line_code)
+        except ValueError:
+            return False
+        return True
+
+    def _note_unknown_line_code(self, line_code: str) -> None:
+        if line_code in self._unknown_line_codes_seen:
+            return
+        self._unknown_line_codes_seen.add(line_code)
+        logger.warning("Ignoring unsupported line code %s", line_code)
 
     def _upsert_one(self, train: GoTrain) -> None:
         line_code = LINE_CODES(train.line_code)

@@ -9,14 +9,16 @@ from app.services.train_manager import TrainState
 
 
 class DataRefresher():
-    def __init__(self, refresh_interval):
+    def __init__(self, refresh_interval, manager: LineManager | None = None):
         self.last_updated = None
         self.refresh_interval = refresh_interval
         self._cache: Dict[LINE_CODES, List[TrainState]] = {}
         self._lock = threading.Lock()
         self._stop_event = threading.Event()
         self._thread = threading.Thread(target=self._refresh_loop, daemon=True)
-        self.manager = LineManager()
+        # Injection seam: tests pass a LineManager wired to a fake feed so they can
+        # drive refresh() directly without a real service, an API key, or a thread.
+        self.manager = manager if manager is not None else LineManager()
 
     def start(self):
         self._thread.start()

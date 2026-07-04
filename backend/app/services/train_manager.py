@@ -56,6 +56,11 @@ class TrainState:
     last_stop_code: str
     start_time: datetime
     end_time: datetime
+    # The trip's ordered stop list (stop codes, travel order), driving the route
+    # path shown in the info box. Empty when it could not be resolved this cycle --
+    # the UI then falls back to its live next-stop display. A tuple so the frozen
+    # state stays immutable and hashable.
+    stop_codes: tuple[str, ...]
 
     #dynamic
     prev_stop_code: str 
@@ -84,8 +89,9 @@ class TrainManager:
         # to ignore warnings.
         self._unknown_line_codes_seen: set[str] = set()
 
-    def upsert_many(self, trains: list[GoTrain]) -> None:
+    def upsert_many(self, trains: list[GoTrain], stop_codes_by_trip: dict[str, list[str]] | None = None) -> None:
         now = datetime.now()
+        stop_codes_by_trip = stop_codes_by_trip or {}
         prev_states = dict(self.states)
         found_trip_numbers = {train.trip_number for train in trains if train.trip_number}
 
@@ -109,7 +115,7 @@ class TrainManager:
                 self._note_unknown_line_code(train.line_code)
                 continue
             try:
-                self._upsert_one(train, prev_states, new_states)
+                self._upsert_one(train, prev_states, new_states, stop_codes_by_trip)
             except Exception as exc:
                 class_b_errors += 1
                 logger.warning(
@@ -170,7 +176,7 @@ class TrainManager:
         # Publish this cycle's map in one assignment (the successful-cycle commit).
         self.states = new_states
 
-    def _init_state(self, train: GoTrain, line_code: LINE_CODES, direction: Direction, prev_stop_code: str, next_stop_code: str, progress: float, stopped_at_stop_code: str) -> TrainState:
+    def _init_state(self, train: GoTrain, line_code: LINE_CODES, direction: Direction, prev_stop_code: str, next_stop_code: str, progress: float, stopped_at_stop_code: str, stop_codes: tuple[str, ...]) -> TrainState:
         return TrainState(
             trip_number = train.trip_number,
             line_code = line_code,
@@ -179,6 +185,7 @@ class TrainManager:
             last_stop_code = train.last_stop_code,
             start_time = self._parse_datetime(train.start_time),
             end_time = self._parse_datetime(train.end_time),
+            stop_codes = stop_codes,
             prev_stop_code = prev_stop_code,
             next_stop_code = next_stop_code,
             latitude = float(train.latitude),
@@ -189,7 +196,7 @@ class TrainManager:
             stopped_at_stop_code = stopped_at_stop_code
         )
 
-    def _update_state(self, state: TrainState, prev_stop_code: str, next_stop_code: str, latitude: float, longitude: float, progress: float, in_motion: bool, modified_date: str, stopped_at_stop_code: str) -> TrainState:
+    def _update_state(self, state: TrainState, prev_stop_code: str, next_stop_code: str, latitude: float, longitude: float, progress: float, in_motion: bool, modified_date: str, stopped_at_stop_code: str, stop_codes: tuple[str, ...]) -> TrainState:
         # Copy-on-write: return a fresh TrainState rather than mutating the one
         # passed in, which may still be reachable by an API reader serializing it.
         return replace(
@@ -202,6 +209,7 @@ class TrainManager:
             in_motion=in_motion,
             modified_date=self._parse_datetime(modified_date),
             stopped_at_stop_code=stopped_at_stop_code,
+            stop_codes=stop_codes,
         )
 
     def _is_known_line_code(self, line_code: str) -> bool:
@@ -217,7 +225,7 @@ class TrainManager:
         self._unknown_line_codes_seen.add(line_code)
         logger.warning("Ignoring unsupported line code %s", line_code)
 
-    def _upsert_one(self, train: GoTrain, prev_states: dict[str, TrainState], new_states: dict[str, TrainState]) -> None:
+    def _upsert_one(self, train: GoTrain, prev_states: dict[str, TrainState], new_states: dict[str, TrainState], stop_codes_by_trip: dict[str, list[str]]) -> None:
         line_code = LINE_CODES(train.line_code)
         line = self._resolve_line_context(train, line_code)
         if line is None:
@@ -279,6 +287,13 @@ class TrainManager:
         prev_stop_code = prev_stop.stop_id if prev_stop else ""
         next_stop_code = next_stop.stop_id if next_stop else ""
 
+        # Prefer a freshly-resolved stop list, but fall back to whatever the prior
+        # cycle held so a transient Schedule/Trip failure never blanks a route path
+        # that was already known (the list is static for the service day).
+        resolved_stop_codes = tuple(stop_codes_by_trip.get(train.trip_number, []))
+        if not resolved_stop_codes and existing is not None:
+            resolved_stop_codes = existing.stop_codes
+
         if existing is None:
             existing = self._init_state(
                 train = train,
@@ -287,7 +302,8 @@ class TrainManager:
                 prev_stop_code = prev_stop_code,
                 next_stop_code = next_stop_code,
                 progress = progress,
-                stopped_at_stop_code = stopped_at_stop_code
+                stopped_at_stop_code = stopped_at_stop_code,
+                stop_codes = resolved_stop_codes
             )
         else:
             existing = self._update_state(
@@ -300,6 +316,7 @@ class TrainManager:
                 in_motion=bool(train.is_in_motion),
                 modified_date=train.modified_date,
                 stopped_at_stop_code=stopped_at_stop_code,
+                stop_codes=resolved_stop_codes,
             )
 
         new_states[train.trip_number] = existing

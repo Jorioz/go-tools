@@ -91,6 +91,12 @@ class MetrolinxService:
             )
         self.trains: List[GoTrain] = []
         self.last_updated: Optional[datetime] = None
+        # A trip's ordered stop list is static for the service day, so resolved
+        # lists are memoised per (service_date, trip_number) and the refresh loop
+        # only pays for the Schedule/Trip call once per trip per day rather than
+        # every cycle. Keyed by date so the cache naturally rolls over at midnight
+        # instead of growing without bound or serving yesterday's schedule.
+        self._trip_stop_cache: Dict[tuple[str, str], List[str]] = {}
 
     def _fetch(self, endpoint: str):
         BASE_URL = "https://api.openmetrolinx.com/OpenDataAPI"
@@ -156,5 +162,113 @@ class MetrolinxService:
 
     def get_last_updated(self) -> Optional[datetime]:
         return self.last_updated
+
+    def get_trip_stop_codes(self, trip_number: str, service_date: str) -> List[str]:
+        """Return the trip's ordered stop codes, memoised per service day.
+
+        Fetches the Metrolinx ``Schedule/Trip`` endpoint (the ordered list of
+        stations a trip calls at) and returns their stop codes in travel order.
+        Distinct from the live ServiceataGlance feed: it drives the *route path*,
+        so an express trip yields only the stops it actually serves.
+
+        Failure is non-fatal by contract: any fetch/shape problem returns ``[]``
+        so the caller degrades to its live next-stop display and one unresolvable
+        trip never takes down a refresh cycle. A transient failure is NOT cached,
+        so the next cycle retries; a well-formed response (including a legitimately
+        empty one) IS cached so the loop stops hammering the API for that trip.
+        """
+        if not trip_number or not service_date:
+            return []
+
+        cache_key = (service_date, trip_number)
+        cached = self._trip_stop_cache.get(cache_key)
+        if cached is not None:
+            return list(cached)
+
+        try:
+            data = self._fetch(f"api/V1/Schedule/Trip/{service_date}/{trip_number}")
+            stop_codes = self._parse_trip_stop_codes(data, trip_number)
+        except MetrolinxFeedError:
+            # Network/shape failure: leave uncached so a later cycle can recover.
+            return []
+
+        self._trip_stop_cache[cache_key] = stop_codes
+        return list(stop_codes)
+
+    def _parse_trip_stop_codes(self, data: Any, trip_number: str) -> List[str]:
+        """Extract ordered stop codes from a ``Schedule/Trip`` envelope.
+
+        The live envelope is ``{"Metadata": {...}, "Trips": [...]}``: ``Trips`` is
+        a plain JSON list (NOT the ``Trips.Trip`` container ServiceataGlance uses),
+        each trip carries ``Number``/``Stops``, and each stop dict carries a
+        ``Code``. The feed lists stops in travel order (scheduled times ascending)
+        and has no explicit order field, so feed order is preserved as-is.
+
+        Contract, mirroring ServiceataGlance's boundary between drift and empty:
+
+        * ``Metadata.ErrorCode == "204"`` (No Content) or a well-formed envelope
+          with an empty ``Trips`` list is a legitimately-unresolvable trip ->
+          ``[]`` as a SUCCESS (the caller caches it).
+        * Any other non-200 ``ErrorCode``, or a structurally malformed envelope
+          (``Trips``/``Stops`` mis-typed), raises ``MetrolinxFeedError`` so the
+          caller treats the cycle as transient and retries later.
+        """
+        if not isinstance(data, dict):
+            raise MetrolinxFeedError(
+                f"Unexpected trip-schedule envelope: expected a dict, got {type(data).__name__}"
+            )
+
+        # 204 is the API's explicit "no such trip" signal (returned with an empty
+        # Trips list) -- a cacheable success, not drift. Other non-200 codes mean
+        # the payload can't be trusted this cycle: raise so it stays uncached.
+        metadata = data.get("Metadata")
+        if isinstance(metadata, dict):
+            error_code = str(metadata.get("ErrorCode", "")).strip()
+            if error_code == "204":
+                return []
+            if error_code and error_code != "200":
+                raise MetrolinxFeedError(
+                    f"Trip-schedule request failed: Metadata.ErrorCode {error_code} "
+                    f"({metadata.get('ErrorMessage', '')})"
+                )
+
+        trips = data.get("Trips")
+        if trips is None:
+            return []
+        if not isinstance(trips, list):
+            raise MetrolinxFeedError(
+                f"Unexpected trip-schedule envelope: 'Trips' is {type(trips).__name__}, expected a list"
+            )
+        if not trips:
+            return []
+
+        # Match the requested trip by Number when identifiable; otherwise take the
+        # first entry (the endpoint is keyed by trip number, so one entry is the
+        # normal case).
+        entries = [trip for trip in trips if isinstance(trip, dict)]
+        if not entries:
+            raise MetrolinxFeedError(
+                "Unexpected trip-schedule envelope: 'Trips' contains no dict entries"
+            )
+        trip = next(
+            (entry for entry in entries if str(entry.get("Number", "")) == trip_number),
+            entries[0],
+        )
+
+        stops = trip.get("Stops")
+        if stops is None:
+            return []
+        if not isinstance(stops, list):
+            raise MetrolinxFeedError(
+                f"Unexpected trip-schedule envelope: 'Stops' is {type(stops).__name__}, expected a list"
+            )
+
+        # Feed order IS travel order (no explicit order field exists).
+        codes = [
+            str(stop.get("Code", "")).strip()
+            for stop in stops
+            if isinstance(stop, dict)
+        ]
+        return [code for code in codes if code]
 
 

@@ -25,9 +25,14 @@ export const TrainSchema = z
         inMotion: z.boolean(),
         modifiedDate: z.date(),
         stoppedAtStopCode: z.string(),
+        stopCodes: z.array(z.string()),
     })
     .superRefine((data, ctx) => {
         const stops = STOPS_BY_LINE[data.lineCode];
+        // stopCodes is intentionally excluded here: an unrecognised code in the
+        // trip's route path should not reject the whole train (it stays
+        // renderable and the info box tolerates unknown codes), unlike the
+        // position fields below which must resolve to known stations.
         const stopFields = [
             "firstStopCode",
             "lastStopCode",

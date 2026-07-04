@@ -91,6 +91,12 @@ class MetrolinxService:
             )
         self.trains: List[GoTrain] = []
         self.last_updated: Optional[datetime] = None
+        # A trip's ordered stop list is static for the service day, so resolved
+        # lists are memoised per (service_date, trip_number) and the refresh loop
+        # only pays for the Schedule/Trip call once per trip per day rather than
+        # every cycle. Keyed by date so the cache naturally rolls over at midnight
+        # instead of growing without bound or serving yesterday's schedule.
+        self._trip_stop_cache: Dict[tuple[str, str], List[str]] = {}
 
     def _fetch(self, endpoint: str):
         BASE_URL = "https://api.openmetrolinx.com/OpenDataAPI"
@@ -156,5 +162,88 @@ class MetrolinxService:
 
     def get_last_updated(self) -> Optional[datetime]:
         return self.last_updated
+
+    def get_trip_stop_codes(self, trip_number: str, service_date: str) -> List[str]:
+        """Return the trip's ordered stop codes, memoised per service day.
+
+        Fetches the Metrolinx ``Schedule/Trip`` endpoint (the ordered list of
+        stations a trip calls at) and returns their stop codes in travel order.
+        Distinct from the live ServiceataGlance feed: it drives the *route path*,
+        so an express trip yields only the stops it actually serves.
+
+        Failure is non-fatal by contract: any fetch/shape problem returns ``[]``
+        so the caller degrades to its live next-stop display and one unresolvable
+        trip never takes down a refresh cycle. A transient failure is NOT cached,
+        so the next cycle retries; a well-formed response (including a legitimately
+        empty one) IS cached so the loop stops hammering the API for that trip.
+        """
+        if not trip_number or not service_date:
+            return []
+
+        cache_key = (service_date, trip_number)
+        cached = self._trip_stop_cache.get(cache_key)
+        if cached is not None:
+            return list(cached)
+
+        try:
+            data = self._fetch(f"api/V1/Schedule/Trip/{service_date}/{trip_number}")
+            stop_codes = self._parse_trip_stop_codes(data)
+        except MetrolinxFeedError:
+            # Network/shape failure: leave uncached so a later cycle can recover.
+            return []
+
+        self._trip_stop_cache[cache_key] = stop_codes
+        return list(stop_codes)
+
+    def _parse_trip_stop_codes(self, data: Any) -> List[str]:
+        """Extract ordered stop codes from a ``Schedule/Trip`` envelope.
+
+        Mirrors the ServiceataGlance contract: a malformed envelope raises
+        ``MetrolinxFeedError`` (so the caller treats it as a transient failure and
+        retries), while a well-formed envelope with no stops is a success ([]).
+        The stop container follows the same list-or-single-dict shape as ``Trip``.
+        """
+        if not isinstance(data, dict):
+            raise MetrolinxFeedError(
+                f"Unexpected trip-schedule envelope: expected a dict, got {type(data).__name__}"
+            )
+
+        trip = data.get("Trip")
+        if trip is None:
+            return []
+        if not isinstance(trip, dict):
+            raise MetrolinxFeedError(
+                f"Unexpected trip-schedule envelope: 'Trip' is {type(trip).__name__}, expected a dict"
+            )
+
+        stops_container = trip.get("Stops")
+        if stops_container is None:
+            return []
+        if not isinstance(stops_container, dict):
+            raise MetrolinxFeedError(
+                f"Unexpected trip-schedule envelope: 'Stops' is "
+                f"{type(stops_container).__name__}, expected a dict"
+            )
+
+        stops = stops_container.get("Stop", [])
+        if stops is None:
+            return []
+        if isinstance(stops, dict):
+            stops = [stops]
+        if not isinstance(stops, list):
+            raise MetrolinxFeedError(
+                f"Unexpected trip-schedule envelope: 'Stop' is {type(stops).__name__}, "
+                "expected a list or dict"
+            )
+
+        entries = [stop for stop in stops if isinstance(stop, dict)]
+        # The feed lists stops in travel order, but sort by 'Order' when every stop
+        # carries one so we never depend on incidental ordering; fall back to feed
+        # order otherwise.
+        if entries and all("Order" in entry for entry in entries):
+            entries.sort(key=lambda entry: GoTrain._safe_int(entry.get("Order"), 0))
+
+        codes = [str(entry.get("Code", "")).strip() for entry in entries]
+        return [code for code in codes if code]
 
 

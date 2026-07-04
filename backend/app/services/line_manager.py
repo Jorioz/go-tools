@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 from app.services.metrolinx_service import MetrolinxService
 from app.services.line_builder import LineBuilder
@@ -76,7 +77,35 @@ class LineManager:
     
     def refresh_trains(self) -> None:
         raw_trains = self.go_service.get_train_data()
-        self.train_manager.upsert_many(raw_trains)
+        stop_codes_by_trip = self._resolve_stop_codes(raw_trains)
+        self.train_manager.upsert_many(raw_trains, stop_codes_by_trip)
+
+    def _resolve_stop_codes(self, raw_trains) -> dict[str, list[str]]:
+        # Resolve each active trip's ordered stop list once per cycle. The service
+        # memoises per (service_date, trip_number), so a trip is fetched from the
+        # Schedule/Trip endpoint at most once per day; every later cycle is a cheap
+        # cache hit. An unresolvable trip yields [] and the train still renders.
+        stop_codes_by_trip: dict[str, list[str]] = {}
+        for train in raw_trains:
+            if not train.trip_number:
+                continue
+            service_date = self._service_date_for(train)
+            stop_codes_by_trip[train.trip_number] = self.go_service.get_trip_stop_codes(
+                train.trip_number, service_date
+            )
+        return stop_codes_by_trip
+
+    def _service_date_for(self, train) -> str:
+        # The Schedule/Trip endpoint keys on the service day (YYYYMMDD). Derive it
+        # from the trip's start time so a train that began before midnight keeps its
+        # own service day; fall back to today when the start time is unparseable.
+        raw = (getattr(train, "start_time", "") or "").strip()
+        for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M"):
+            try:
+                return datetime.strptime(raw, fmt).strftime("%Y%m%d")
+            except ValueError:
+                pass
+        return datetime.now().strftime("%Y%m%d")
 
     def get_train_states_for_line(self, line_code: LINE_CODES):
         return [

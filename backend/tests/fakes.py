@@ -34,9 +34,18 @@ class FakeMetrolinxService:
         start empty and set it later with :meth:`set_script`.
     """
 
-    def __init__(self, script: Sequence[Outcome] | None = None) -> None:
+    def __init__(
+        self,
+        script: Sequence[Outcome] | None = None,
+        stop_codes_by_trip: dict[str, Sequence[str]] | None = None,
+    ) -> None:
         self._script: List[Outcome] = list(script) if script is not None else []
         self.call_count = 0
+        # Optional per-trip ordered stop lists returned by get_trip_stop_codes.
+        # A trip absent here resolves to [] -- the unresolvable-trip fallback.
+        self._stop_codes_by_trip: dict[str, List[str]] = {
+            trip: list(codes) for trip, codes in (stop_codes_by_trip or {}).items()
+        }
 
     def set_script(self, script: Sequence[Outcome]) -> "FakeMetrolinxService":
         """Replace the scripted outcomes and reset the cycle counter."""
@@ -64,3 +73,11 @@ class FakeMetrolinxService:
         if isinstance(outcome, BaseException):
             raise outcome
         return list(outcome)
+
+    def get_trip_stop_codes(self, trip_number: str, service_date: str) -> List[str]:
+        """Return the scripted ordered stop codes for a trip, or [] if none.
+
+        Mirrors the real service's contract: an unknown trip resolves to an empty
+        list (the graceful-degradation path) rather than raising.
+        """
+        return list(self._stop_codes_by_trip.get(trip_number, []))

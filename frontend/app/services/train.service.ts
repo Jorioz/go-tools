@@ -18,6 +18,10 @@ const RawTrainSchema = z.object({
     in_motion: z.boolean(),
     modified_date: z.coerce.date(),
     stopped_at_stop_code: z.string(),
+    // Ordered trip stop list (travel order). Tolerate an absent field from an
+    // older backend by defaulting to an empty list -- the UI then falls back to
+    // its live next-stop display.
+    stop_codes: z.array(z.string()).optional().default([]),
 });
 
 const RawByLineResponse = z.object({
@@ -56,6 +60,7 @@ const toTrain = (raw: z.infer<typeof RawTrainSchema>): Train => ({
     inMotion: raw.in_motion,
     modifiedDate: raw.modified_date,
     stoppedAtStopCode: raw.stopped_at_stop_code,
+    stopCodes: raw.stop_codes,
 });
 
 async function apiFetch(

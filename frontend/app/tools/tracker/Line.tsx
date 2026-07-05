@@ -1,4 +1,4 @@
-import Station from "./Station";
+import Station, { type StationRouteStatus } from "./Station";
 import Train from "./Train";
 import type { Train as TrainModel } from "~/models/train";
 import type { StationSelection } from "~/hooks/useMapSelection";
@@ -199,6 +199,27 @@ export default function Line({
               .join(" ")
         : null;
 
+    // When the selected train's trip resolves to a served/skipped stop list,
+    // map each on-route station name to its status; stations absent from the
+    // list are off-route (behind the train or beyond its destination). When the
+    // trip is unresolved (remainingStops === null) the map stays empty and
+    // stations render normally, matching the pre-selection look.
+    const routeStatusByName = new Map<string, StationRouteStatus>();
+    if (selectedRoute?.remainingStops) {
+        for (const stop of selectedRoute.remainingStops) {
+            routeStatusByName.set(stop.name, stop.status);
+        }
+    }
+    const hasStationStatus = Boolean(selectedRoute?.remainingStops);
+    const getStationRouteStatus = (
+        name: string,
+    ): StationRouteStatus | undefined => {
+        if (!hasStationStatus) {
+            return undefined;
+        }
+        return routeStatusByName.get(name) ?? "off-route";
+    };
+
     const stoppedOnTrackColor = "#e0c761";
 
     return (
@@ -255,6 +276,9 @@ export default function Line({
                             color={color}
                             label={extensionStation.name}
                             labelPosition={extensionStation.label}
+                            routeStatus={getStationRouteStatus(
+                                extensionStation.name,
+                            )}
                             trainsAtStop={
                                 trainsByStoppedStationName.get(
                                     extensionStation.name,
@@ -291,6 +315,7 @@ export default function Line({
                                     | "left"
                                     | "right"
                             }
+                            routeStatus={getStationRouteStatus(station.name)}
                             trainsAtStop={
                                 trainsByStoppedStationName.get(station.name) ??
                                 []

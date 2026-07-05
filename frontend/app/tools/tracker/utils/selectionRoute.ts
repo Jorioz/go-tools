@@ -1,5 +1,5 @@
 import type { Train } from "~/models/train";
-import { LINES, getStopName, type LineCode } from "./constants";
+import { LINES, STOPS_BY_LINE, getStopName, type LineCode } from "./constants";
 import {
     resolveTrainMotionMarker,
     type Point,
@@ -9,6 +9,18 @@ import {
 type LineConfig = (typeof LINES)[number];
 
 export type TrainSelectionKey = `${LineCode}:${string}`;
+
+// A station on the selected train's remaining route, tagged by whether the trip
+// stops there ("served") or passes it without stopping ("skipped"). Stations
+// behind the train or beyond its destination are off-route and are not listed.
+export type RouteStopStatus = "served" | "skipped";
+export type RouteStop = {
+    stopCode: string;
+    name: string;
+    pointIndex: number;
+    isExtension?: boolean;
+    status: RouteStopStatus;
+};
 
 export type SelectedRoute = {
     lineCode: LineCode;
@@ -20,6 +32,10 @@ export type SelectedRoute = {
     dimmedPoints: Point[];
     dimmedPointsString: string;
     currentPosition: Point;
+    // Ordered stations on the remaining route (travel order) with served/skipped
+    // status. null when the trip's stop list is unresolved (empty stopCodes) --
+    // callers then render without a served/skipped distinction.
+    remainingStops: RouteStop[] | null;
 };
 
 const samePoint = (a: Point, b: Point) =>
@@ -153,8 +169,105 @@ const getNextPointIndexOnPath = (
     return indices[indices.length - 1];
 };
 
+const buildReverseStops = (lineId: LineCode): Map<string, string> => {
+    const stops = STOPS_BY_LINE[lineId] ?? {};
+    const reverse = new Map<string, string>();
+    for (const [code, name] of Object.entries(stops)) {
+        reverse.set(name, code);
+    }
+    return reverse;
+};
+
+// Determine which stations lie on the remaining route (from the train's current
+// position to its destination) and whether each is served or skipped. The route
+// is bounded by point indices -- everything behind the train (below the start
+// index) or beyond the destination (past the boundary index) is off-route and
+// excluded. Served vs skipped is decided purely by membership in the trip's
+// stopCodes, so an all-stops local marks every covered station served while an
+// express marks the stations it passes without stopping as skipped.
+const computeRemainingStops = (
+    line: LineConfig,
+    routeStartIndex: number,
+    boundaryIndex: number,
+    destinationIsExtension: boolean,
+    stopCodes: string[],
+): RouteStop[] | null => {
+    if (stopCodes.length === 0) {
+        return null;
+    }
+
+    const stopCodeSet = new Set(
+        stopCodes.map((code) => code.trim().toUpperCase()),
+    );
+    const reverse = buildReverseStops(line.id);
+
+    type Src = {
+        code: string;
+        name: string;
+        pointIndex: number;
+        isExtension?: boolean;
+    };
+
+    // Union is always the first point on the line and is not part of the
+    // stations array, so add it explicitly; the extension station (e.g.
+    // Hamilton) is only on the route when it's the destination and is appended
+    // below.
+    const source: Src[] = [
+        { code: "UN", name: getStopName(line.id, "UN"), pointIndex: 0 },
+        ...line.stations.map((station) => ({
+            code: (reverse.get(station.name) ?? "").toUpperCase(),
+            name: station.name,
+            pointIndex: station.pointIndex,
+        })),
+    ];
+
+    const lo = Math.min(routeStartIndex, boundaryIndex);
+    const hi = Math.max(routeStartIndex, boundaryIndex);
+    const ascending = routeStartIndex <= boundaryIndex;
+
+    const covered = source
+        .filter(
+            (entry) => entry.pointIndex >= lo && entry.pointIndex <= hi,
+        )
+        .sort((a, b) =>
+            ascending
+                ? a.pointIndex - b.pointIndex
+                : b.pointIndex - a.pointIndex,
+        );
+
+    if (destinationIsExtension && line.extension?.station) {
+        const extName = line.extension.station.name;
+        covered.push({
+            code: (reverse.get(extName) ?? "").toUpperCase(),
+            name: extName,
+            pointIndex: line.extension.fromPointIndex,
+            isExtension: true,
+        });
+    }
+
+    if (covered.length === 0) {
+        return null;
+    }
+
+    return covered.map((entry) => ({
+        stopCode: entry.code,
+        name: entry.name,
+        pointIndex: entry.pointIndex,
+        isExtension: entry.isExtension,
+        status: (stopCodeSet.has(entry.code)
+            ? "served"
+            : "skipped") as RouteStopStatus,
+    }));
+};
+
 export const getTrainSelectionKey = (train: Train): TrainSelectionKey =>
     `${train.lineCode}:${train.tripNumber}`;
+
+// Convenience accessor for callers (e.g. the info box) that only need the
+// ordered served/skipped stop list, not the polyline geometry.
+export const getRemainingRouteStops = (
+    train: Train | null | undefined,
+): RouteStop[] | null => buildSelectedRoute(train)?.remainingStops ?? null;
 
 export const buildSelectedRoute = (
     train: Train | null | undefined,
@@ -286,6 +399,21 @@ export const buildSelectedRoute = (
         appendPoint(dimmedPoints, currentPosition);
     }
 
+    const boundaryIndex = destinationIsExtension
+        ? line.extension?.fromPointIndex
+        : destinationAnchor.pointIndex;
+
+    const remainingStops =
+        typeof boundaryIndex === "number"
+            ? computeRemainingStops(
+                  line,
+                  routeStartIndex,
+                  boundaryIndex,
+                  destinationIsExtension,
+                  train.stopCodes,
+              )
+            : null;
+
     return {
         lineCode: line.id,
         selectionKey: getTrainSelectionKey(train),
@@ -296,5 +424,6 @@ export const buildSelectedRoute = (
         dimmedPoints,
         dimmedPointsString: dimmedPoints.map(([x, y]) => `${x} ${y}`).join(" "),
         currentPosition,
+        remainingStops,
     };
 };

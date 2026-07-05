@@ -1,6 +1,7 @@
 import React from "react";
 import type { Train } from "~/models/train";
 import { getStopName, LINES, DIRECTION_LABELS } from "../utils/constants";
+import { getRemainingRouteStops } from "../utils/selectionRoute";
 
 function findLineInfo(lineCode: string) {
     const found = LINES.find((l) => l.id === lineCode);
@@ -34,7 +35,11 @@ export default function InfoBoxTrainView({ train }: { train: Train }) {
     const nextStopName = nextStop ? getStopName(train.lineCode, nextStop) : "Unknown";
     const directionLabel = DIRECTION_LABELS[train.direction] ?? "Unknown";
 
-    const remaining = remainingStopCodes(train);
+    // Preferred: the ordered remaining route with served/skipped status. Falls
+    // back to the plain served-only list (from #19) when the trip's stop list is
+    // unresolved or the position can't be located on it.
+    const routeStops = getRemainingRouteStops(train);
+    const remaining = routeStops ? null : remainingStopCodes(train);
 
     return (
         <div>
@@ -67,6 +72,57 @@ export default function InfoBoxTrainView({ train }: { train: Train }) {
                     {train.inMotion ? "Moving" : "Stopped"}
                 </div>
             </div>
+
+            {routeStops && routeStops.length > 0 && (
+                <div className="mt-3 border-t border-neutral-700 pt-3">
+                    <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-400">
+                        Remaining stops
+                    </div>
+                    <ol className="space-y-1 text-sm">
+                        {routeStops.map((stop, i) => {
+                            const isSkipped = stop.status === "skipped";
+                            return (
+                                <li
+                                    key={`${stop.stopCode}-${i}`}
+                                    className={`flex items-center gap-2 ${
+                                        isSkipped
+                                            ? "text-neutral-500"
+                                            : "text-neutral-300"
+                                    }`}
+                                >
+                                    <span
+                                        className="h-2 w-2 shrink-0 rounded-full"
+                                        style={
+                                            isSkipped
+                                                ? {
+                                                      backgroundColor:
+                                                          "transparent",
+                                                      border: `1px solid #6b7280`,
+                                                  }
+                                                : {
+                                                      backgroundColor:
+                                                          line.color,
+                                                  }
+                                        }
+                                    />
+                                    <span
+                                        className={
+                                            isSkipped ? "line-through" : ""
+                                        }
+                                    >
+                                        {stop.name}
+                                    </span>
+                                    {isSkipped && (
+                                        <span className="text-[10px] uppercase tracking-wide text-neutral-600">
+                                            skipped
+                                        </span>
+                                    )}
+                                </li>
+                            );
+                        })}
+                    </ol>
+                </div>
+            )}
 
             {remaining && remaining.length > 0 && (
                 <div className="mt-3 border-t border-neutral-700 pt-3">

@@ -300,7 +300,7 @@ export const resolveStoppedTrainAngle = ({
         if (forwardIndex !== backwardIndex) {
             const [backX, backY] = points[backwardIndex];
             const [forwardX, forwardY] = points[forwardIndex];
-            const movingForward = direction === 0 ? true : direction > 0;
+            const movingForward = direction === 0;
 
             return movingForward
                 ? computeMarkerAngle(forwardX - backX, forwardY - backY)

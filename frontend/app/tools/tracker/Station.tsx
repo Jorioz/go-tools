@@ -115,15 +115,20 @@ export default function Station({
                         strokeWidth="18"
                     />
                 ) : routeStatus === "skipped" ? (
-                    // Skipped: small hollow dot, faded, ringed in the line colour.
+                    // Skipped: small faded white dot, no ring. Must NOT use the
+                    // line colour -- it sits on top of the highlighted polyline
+                    // (same colour at near-full opacity), where a line-coloured
+                    // marker vanishes. White contrasts with all line colours;
+                    // the smaller size, lower opacity, and missing ring keep it
+                    // de-emphasized vs the served dot, and the bright line
+                    // beneath it distinguishes it from off-route dots sitting
+                    // on the dimmed line.
                     <circle
                         cx={x}
                         cy={y}
-                        r="26"
-                        className="pointer-events-none fill-none"
-                        stroke={color}
-                        strokeWidth="14"
-                        opacity="0.4"
+                        r="24"
+                        className="pointer-events-none fill-white"
+                        opacity="0.55"
                     />
                 ) : (
                     // Off-route: dimmed to match the dimmed base polyline.

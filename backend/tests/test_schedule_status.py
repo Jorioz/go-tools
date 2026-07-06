@@ -20,6 +20,7 @@ from app.services.schedule_status import (
     ScheduleStatusProvider,
     TripWindow,
     _gtfs_time_to_seconds,
+    _resolve_line_code,
 )
 
 
@@ -319,3 +320,15 @@ def test_gtfs_time_to_seconds_handles_hours_past_24() -> None:
     assert _gtfs_time_to_seconds("") is None
     assert _gtfs_time_to_seconds("not-a-time") is None
     assert _gtfs_time_to_seconds("12:60:00") is None
+
+
+def test_only_rail_routes_map_to_a_line() -> None:
+    # A rail route (route_type 2) maps by short name or long-name keyword.
+    assert _resolve_line_code("MI", "Milton", "2") == LINE_CODES.MILTON
+    assert _resolve_line_code("KI", "Kitchener", "2") == LINE_CODES.KITCHENER
+    # A bus route (route_type 3) whose name contains a rail line's name must NOT
+    # map -- otherwise late-night buses keep the rail line lit past its last train.
+    assert _resolve_line_code("27", "Milton / North York", "3") is None
+    assert _resolve_line_code("31", "Guelph / Toronto", "3") is None
+    # Non-rail types are rejected even with an exact short-name match.
+    assert _resolve_line_code("MI", "Milton", "3") is None

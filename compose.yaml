@@ -15,6 +15,12 @@ services:
         build:
             context: ./backend
         container_name: go-tools-backend
+        # GO's GTFS schedule times are agency-local (Eastern), and the backend
+        # compares them against a naive datetime.now(). Without this the container
+        # runs in UTC and evaluates the schedule ~4-5h off, so schedule-derived
+        # line status (dimming out-of-service lines) is wrong. Pin to Eastern.
+        environment:
+            - TZ=America/Toronto
         ports:
             - "8000:8000"
         volumes:

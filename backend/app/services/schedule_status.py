@@ -43,6 +43,11 @@ logger = logging.getLogger(__name__)
 # timetable says its last train should have arrived.
 DEFAULT_GRACE = timedelta(minutes=30)
 
+# GTFS ``route_type`` for rail. Only rail routes count toward a line's scheduled
+# service: bus routes (type 3) named after a rail line run hours past the last
+# train and would otherwise keep the line lit overnight.
+_RAIL_ROUTE_TYPE = "2"
+
 # A modeled line's service window on a given service date, as absolute datetimes:
 # (first scheduled departure, last scheduled arrival). The arrival may fall on
 # the following calendar day for trips with GTFS times past 24:00.
@@ -310,13 +315,24 @@ class ScheduleStatusProvider:
         return {code: True for code in LINE_CODES}
 
 
-def _resolve_line_code(short_name: str, long_name: str) -> LINE_CODES | None:
+def _resolve_line_code(
+    short_name: str, long_name: str, route_type: object = _RAIL_ROUTE_TYPE
+) -> LINE_CODES | None:
     """Map a GTFS route to a modeled line, or ``None`` if it isn't one of ours.
 
-    Tries the route's short name against the internal line codes first, then
-    falls back to keyword-matching the long name. Unmatched routes (buses, UP
-    Express, unfamiliar naming) resolve to ``None`` and are simply ignored.
+    Only rail routes (GTFS ``route_type`` 2) are mapped: this is a *train*
+    tracker, and a line's scheduled-service window must reflect when its trains
+    run. GO also publishes bus routes whose names contain a rail line's name
+    (e.g. "Milton / North York") and which run hours later than the last train;
+    mapping those would keep a line lit long after its trains stop. Non-rail
+    routes resolve to ``None`` and are ignored.
+
+    Among rail routes, tries the route's short name against the internal line
+    codes first, then falls back to keyword-matching the long name. Unmatched
+    rail routes (unfamiliar naming) resolve to ``None``.
     """
+    if str(route_type).strip() != _RAIL_ROUTE_TYPE:
+        return None
     code = (short_name or "").strip().upper()
     for line_code in LINE_CODES:
         if code == line_code.value:
@@ -505,6 +521,7 @@ def load_gtfs_schedule(raw_dir: Path | None = None) -> Optional[ScheduleData]:
             line_code = _resolve_line_code(
                 row.get("route_short_name", ""),
                 row.get("route_long_name", ""),
+                row.get("route_type", ""),
             )
             if line_code is not None:
                 route_line[str(row["route_id"]).strip()] = line_code

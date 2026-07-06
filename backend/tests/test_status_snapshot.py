@@ -42,18 +42,22 @@ def _make_refresher(script, *, clock, status_provider) -> DataRefresher:
     )
 
 
-def _provider_marking_milton_out() -> ScheduleStatusProvider:
-    # Weekday-only Milton service; on a Saturday it has zero trips -> out. Every
-    # other line has an all-week service -> in. Loader returns hand-built data.
+def _provider_marking_le_out() -> ScheduleStatusProvider:
+    # Weekday-only Lakeshore East service; on a Saturday it has zero trips -> out.
+    # Every other line has an all-week service -> in. Lakeshore East is chosen
+    # because the fake manager maps only Milton, so LE never carries a live train
+    # and the live-train override (issue #27) can't flip it back in -- letting the
+    # snapshot-plumbing assertions target a genuinely dimmed line. Loader returns
+    # hand-built data.
     data = ScheduleData(
         calendar=(
-            _service("milton_weekday", (True,) * 5 + (False, False)),
+            _service("le_weekday", (True,) * 5 + (False, False)),
             _service("others_everyday", (True,) * 7),
         ),
         trips_by_service={
-            "milton_weekday": {LINE_CODES.MILTON},
+            "le_weekday": {LINE_CODES.LAKESHORE_EAST},
             "others_everyday": {
-                code for code in LINE_CODES if code != LINE_CODES.MILTON
+                code for code in LINE_CODES if code != LINE_CODES.LAKESHORE_EAST
             },
         },
     )
@@ -79,15 +83,15 @@ def test_status_map_is_published_on_the_snapshot() -> None:
     refresher = _make_refresher(
         [[make_train("1001", latitude=0.3)]],
         clock=clock,
-        status_provider=_provider_marking_milton_out(),
+        status_provider=_provider_marking_le_out(),
     )
     refresher.refresh()
 
     statuses = refresher.get_statuses()
-    assert statuses[LINE_CODES.MILTON] is False
+    assert statuses[LINE_CODES.LAKESHORE_EAST] is False
     assert statuses[LINE_CODES.LAKESHORE_WEST] is True
     # The status lives on the same snapshot object as the states.
-    assert refresher._snapshot.statuses_by_line[LINE_CODES.MILTON] is False
+    assert refresher._snapshot.statuses_by_line[LINE_CODES.LAKESHORE_EAST] is False
 
 
 def test_stale_snapshot_fails_open_for_statuses() -> None:
@@ -95,10 +99,10 @@ def test_stale_snapshot_fails_open_for_statuses() -> None:
     refresher = _make_refresher(
         [[make_train("1001", latitude=0.3)]],
         clock=clock,
-        status_provider=_provider_marking_milton_out(),
+        status_provider=_provider_marking_le_out(),
     )
     refresher.refresh()
-    assert refresher.get_statuses()[LINE_CODES.MILTON] is False
+    assert refresher.get_statuses()[LINE_CODES.LAKESHORE_EAST] is False
 
     # Past the staleness cutoff: statuses fail open exactly as states go empty.
     clock.advance(refresher.refresh_interval * STALE_AFTER_CYCLES + 1)
@@ -111,7 +115,61 @@ def test_initial_snapshot_before_refresh_fails_open() -> None:
     refresher = _make_refresher(
         [[make_train("1001", latitude=0.3)]],
         clock=clock,
-        status_provider=_provider_marking_milton_out(),
+        status_provider=_provider_marking_le_out(),
     )
     # Nothing refreshed yet: the empty snapshot reads as all in service.
     assert all(refresher.get_statuses()[code] is True for code in LINE_CODES)
+
+
+def _provider_marking_milton_out() -> ScheduleStatusProvider:
+    # Weekday-only Milton service; on a Saturday it has zero trips -> schedule
+    # says out of service.
+    data = ScheduleData(
+        calendar=(
+            _service("milton_weekday", (True,) * 5 + (False, False)),
+            _service("others_everyday", (True,) * 7),
+        ),
+        trips_by_service={
+            "milton_weekday": {LINE_CODES.MILTON},
+            "others_everyday": {
+                code for code in LINE_CODES if code != LINE_CODES.MILTON
+            },
+        },
+    )
+    return ScheduleStatusProvider(loader=lambda: data)
+
+
+def test_live_train_overrides_schedule_out_of_service() -> None:
+    # Saturday 2026-07-04: the schedule says Milton is out (weekday-only service),
+    # but a live Milton train is on the tracks -- the map can be wrong, a train
+    # cannot -- so the override forces Milton in service on the snapshot.
+    clock = FakeClock(datetime(2026, 7, 4, 9, 0, 0))
+    refresher = _make_refresher(
+        [[make_train("1001", latitude=0.3)]],
+        clock=clock,
+        status_provider=_provider_marking_milton_out(),
+    )
+
+    # Sanity: the pure provider (no override) still reports Milton out for the day.
+    assert refresher._status_provider.get_statuses("20260704")[LINE_CODES.MILTON] is False
+
+    refresher.refresh()
+
+    # After the snapshot post-step, the live train wins.
+    assert refresher.get_statuses()[LINE_CODES.MILTON] is True
+    assert refresher._snapshot.statuses_by_line[LINE_CODES.MILTON] is True
+
+
+def test_schedule_out_stands_when_no_live_train() -> None:
+    # Same Saturday schedule, but an empty feed: with no live Milton train the
+    # override does not fire and the line stays dimmed.
+    clock = FakeClock(datetime(2026, 7, 4, 9, 0, 0))
+    refresher = _make_refresher(
+        [[]],
+        clock=clock,
+        status_provider=_provider_marking_milton_out(),
+    )
+    refresher.refresh()
+
+    assert refresher.get_states(LINE_CODES.MILTON) == []
+    assert refresher.get_statuses()[LINE_CODES.MILTON] is False

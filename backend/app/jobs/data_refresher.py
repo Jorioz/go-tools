@@ -102,10 +102,19 @@ class DataRefresher():
             }
             now = self._now()
             # Per-line scheduled-service status for today's service date. The
-            # provider memoizes per date and fails open internally, so this is a
-            # cheap dict lookup after the first scan and never raises. It rides
-            # the same snapshot as the states so a reader sees the two together.
+            # provider memoizes the heavy window scan per date and recomputes the
+            # cheap clock-based status each call, failing open internally, so this
+            # never raises. It rides the same snapshot as the states so a reader
+            # sees the two together.
             statuses_by_line = self._status_provider.get_statuses(now.strftime("%Y%m%d"))
+            # Live-train override: a schedule window can be wrong, but a train on
+            # the tracks cannot. Any line currently showing live trains is forced
+            # in service regardless of what the (memoized, pure) window scan said.
+            # Applied here -- not in the provider -- so the per-date scan stays
+            # pure and cacheable and this stays a cheap per-cycle post-step.
+            for line_code, states in states_by_line.items():
+                if states:
+                    statuses_by_line[line_code] = True
             new_snapshot = Snapshot(
                 states_by_line=states_by_line,
                 last_updated=now,

@@ -16,11 +16,17 @@ import {
 import { LINES } from "./utils/constants";
 import type { Train, TrainsByLine } from "~/models/train";
 import { useMapSelectionContext } from "~/context/mapSelectionContext";
+import {
+    isLineOutOfService,
+    type LineStatuses,
+} from "./utils/lineStatus";
 
 export default function MapSimple({
     trainsByLine,
+    lineStatuses = {},
 }: {
     trainsByLine: TrainsByLine;
+    lineStatuses?: LineStatuses;
 }) {
     const {
         selected,
@@ -176,6 +182,10 @@ export default function MapSimple({
                                     extension={line.extension}
                                     showTrains={false}
                                     showBase={true}
+                                    outOfService={isLineOutOfService(
+                                        lineStatuses,
+                                        line.id,
+                                    )}
                                     onSelectTrain={selectTrain}
                                     onSelectStation={selectStation}
                                     selectedTrain={selectedTrain}

@@ -7,6 +7,7 @@ import time
 from app.services.line_manager import LineManager
 from app.services.metrolinx_service import MetrolinxFeedError
 from app.constants import LINE_CODES
+from app.services.schedule_status import ScheduleStatusProvider
 from app.services.train_manager import TrainState, NoTrainsMappedError
 
 
@@ -18,9 +19,15 @@ class Snapshot:
     reader can never pair a fresh cache with a stale ``last_updated`` (or vice
     versa): both come from the same frozen object, swapped in a single reference
     assignment at the end of a successful refresh cycle.
+
+    ``statuses_by_line`` rides the same frozen object so a reader gets train
+    states and per-line scheduled-service status that are consistent with each
+    other. An empty map (the initial snapshot, or an older code path) reads as
+    "every line in service" on the read path -- fail open by default.
     """
     states_by_line: Dict[LINE_CODES, List[TrainState]] = field(default_factory=dict)
     last_updated: datetime | None = None
+    statuses_by_line: Dict[LINE_CODES, bool] = field(default_factory=dict)
 
 
 # A served snapshot is discarded once its age exceeds this many refresh
@@ -36,6 +43,7 @@ class DataRefresher():
         refresh_interval,
         manager: LineManager | None = None,
         now: Callable[[], datetime] = datetime.now,
+        status_provider: ScheduleStatusProvider | None = None,
     ):
         self.refresh_interval = refresh_interval
         # The single published snapshot. Reads resolve this reference lock-free;
@@ -52,6 +60,13 @@ class DataRefresher():
         # cross the cutoff without sleeping. Defaults to datetime.now (production
         # behavior unchanged).
         self._now = now
+        # Per-service-date scheduled-service status. Shares the same clock seam so
+        # the service date derives from the injected clock, and memoizes so the
+        # schedule scan runs at most once per service date, not per cycle. Fails
+        # open internally, so it never raises into a refresh cycle.
+        self._status_provider = (
+            status_provider if status_provider is not None else ScheduleStatusProvider(now=now)
+        )
 
     @property
     def _stale_after(self) -> timedelta:
@@ -86,7 +101,16 @@ class DataRefresher():
                 for line_code in LINE_CODES
             }
             now = self._now()
-            new_snapshot = Snapshot(states_by_line=states_by_line, last_updated=now)
+            # Per-line scheduled-service status for today's service date. The
+            # provider memoizes per date and fails open internally, so this is a
+            # cheap dict lookup after the first scan and never raises. It rides
+            # the same snapshot as the states so a reader sees the two together.
+            statuses_by_line = self._status_provider.get_statuses(now.strftime("%Y%m%d"))
+            new_snapshot = Snapshot(
+                states_by_line=states_by_line,
+                last_updated=now,
+                statuses_by_line=statuses_by_line,
+            )
             with self._lock:
                 self._snapshot = new_snapshot
             print(f"[{now.strftime('%Y-%m-%d %H:%M:%S')}] Data refresh completed")
@@ -130,3 +154,18 @@ class DataRefresher():
         if self._is_stale(snapshot):
             return []
         return snapshot.states_by_line.get(line_code, [])
+
+    def get_statuses(self) -> Dict[LINE_CODES, bool]:
+        """Per-line in/out-of-service map from the current published snapshot.
+
+        Fails open in every ambiguous case: a stale snapshot, the initial
+        empty snapshot, or a line absent from the map all read as in service.
+        A line is only reported out of service when the live snapshot explicitly
+        says so -- it is never dimmed on missing or expired data.
+        """
+        snapshot = self._snapshot
+        if self._is_stale(snapshot):
+            return {code: True for code in LINE_CODES}
+        return {
+            code: snapshot.statuses_by_line.get(code, True) for code in LINE_CODES
+        }

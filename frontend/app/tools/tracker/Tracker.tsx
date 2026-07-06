@@ -9,7 +9,7 @@ import type { Train } from "~/models/train";
 import { useMapSelectionContext } from "~/context/mapSelectionContext";
 
 export default function Tracker() {
-    const { trainsByLine, isLoading, error, refresh, lastUpdated } =
+    const { trainsByLine, lineStatuses, isLoading, error, refresh, lastUpdated } =
         useTrainContext();
     const { selected, clearSelection } = useMapSelectionContext();
     const isInfoBoxActive = selected !== null;
@@ -33,7 +33,10 @@ export default function Tracker() {
             {bannerMessage && (
                 <Banner message={bannerMessage} type={bannerType} />
             )}
-            <MapSimple trainsByLine={trainsByLine ?? {}} />
+            <MapSimple
+                trainsByLine={trainsByLine ?? {}}
+                lineStatuses={lineStatuses}
+            />
             <InfoBox />
             <div className="fixed bottom-3 w-full flex justify-between md:justify-start md:gap-3 items-end z-40 px-2">
                 <Legend />

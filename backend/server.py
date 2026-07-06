@@ -46,8 +46,14 @@ def get_all_trains():
     data = {
         line_code.value: [asdict(state) for state in refresher.get_states(line_code)] for line_code in LINE_CODES
     }
+    statuses = refresher.get_statuses()
+    line_statuses = {
+        line_code.value: ("in_service" if statuses[line_code] else "out_of_service")
+        for line_code in LINE_CODES
+    }
     return {
-        "lines": data
+        "lines": data,
+        "line_statuses": line_statuses,
     }
 
 @app.get("/api/trains/{line_code}")

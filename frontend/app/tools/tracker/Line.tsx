@@ -42,6 +42,10 @@ interface LineProps {
     };
     showBase?: boolean; // Polyline + Extension + Station Dots + Labels
     showTrains?: boolean;
+    // When the line has zero scheduled trips today, its base rendering (polyline,
+    // extension, station dots, labels) is dimmed so it reads as inactive. Stations
+    // stay clickable and live trains are unaffected (issue #26).
+    outOfService?: boolean;
     selectedTrain?: TrainModel | null;
     showSelectionOverlay?: boolean;
     onSelectTrain?: (train: TrainModel) => void;
@@ -60,6 +64,7 @@ export default function Line({
     extension,
     showBase = true,
     showTrains = true,
+    outOfService = false,
     selectedTrain = null,
     showSelectionOverlay = false,
     onSelectTrain,
@@ -230,7 +235,9 @@ export default function Line({
             overflow="visible"
         >
             {showBase && (
-                <>
+                // Group opacity dims an out-of-service line as a whole while
+                // leaving pointer events intact, so its stations stay clickable.
+                <g opacity={outOfService ? 0.3 : 1}>
                     <polyline
                         points={pointsString}
                         className={`fill-none ${strokeClass} pointer-events-none ${selectedRoute ? "opacity-20" : ""}`}
@@ -337,7 +344,7 @@ export default function Line({
                             }
                         />
                     ))}
-                </>
+                </g>
             )}
             {showTrains &&
                 trainMarkers.map((marker) => {

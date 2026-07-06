@@ -1,6 +1,11 @@
 import { z } from "zod";
 import type { LineCode, Train } from "~/models/train";
 import { LineCodes } from "~/models/train";
+import {
+    LineStatusesSchema,
+    parseLineStatuses,
+    type LineStatuses,
+} from "~/tools/tracker/utils/lineStatus";
 const API_BASE_URL = "";
 const RawTrainSchema = z.object({
     trip_number: z.string(),
@@ -30,6 +35,9 @@ const RawByLineResponse = z.object({
 
 const RawAllTrainsResponse = z.object({
     lines: z.record(LineCodes, z.array(RawTrainSchema)),
+    // Optional per-line scheduled-service status. Absent from older backend
+    // responses -> every line defaults to in service (see parseLineStatuses).
+    line_statuses: LineStatusesSchema,
 });
 
 type ByLineResponse = {
@@ -42,6 +50,7 @@ type AllTrainsResponse = {
     lastUpdated: Date | null;
     refreshInterval: number | null;
     lines: Partial<Record<LineCode, Train[]>>;
+    lineStatuses: LineStatuses;
 };
 
 const toTrain = (raw: z.infer<typeof RawTrainSchema>): Train => ({
@@ -101,6 +110,7 @@ export async function getAllTrains(): Promise<AllTrainsResponse> {
         lastUpdated: parseLastUpdated(headers),
         refreshInterval: parseRefreshInterval(headers),
         lines,
+        lineStatuses: parseLineStatuses(parsed.line_statuses),
     };
 }
 

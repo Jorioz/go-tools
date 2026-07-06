@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState, useEffect } from "react";
 import { getAllTrains } from "~/services/train.service";
 import type { TrainsByLine } from "~/models/train";
+import type { LineStatuses } from "~/tools/tracker/utils/lineStatus";
 
 const DEFAULT_INTERVAL = 15;
 const OFFSET = 15;
@@ -8,6 +9,7 @@ const OFFSET = 15;
 export function useTrain() {
     const [isLoading, setIsLoading] = useState(false);
     const [trainsByLine, setTrainsByLine] = useState<TrainsByLine>();
+    const [lineStatuses, setLineStatuses] = useState<LineStatuses>({});
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
     const [error, setError] = useState<Error | null>(null);
 
@@ -66,6 +68,9 @@ export function useTrain() {
                     serverLast.getTime() !== lastUpdatedRef.current.getTime())
             ) {
                 setTrainsByLine(data.lines);
+                // Statuses ride the same snapshot/timestamp as the states, so
+                // update them in lockstep with trainsByLine.
+                setLineStatuses(data.lineStatuses);
                 setLastUpdated(serverLast);
                 lastUpdatedRef.current = serverLast;
             }
@@ -102,6 +107,7 @@ export function useTrain() {
 
     return {
         trainsByLine,
+        lineStatuses,
         lastUpdated,
         isLoading,
         error,

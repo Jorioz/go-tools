@@ -245,7 +245,7 @@ class TrainManager:
         line = self._resolve_line_context(train, line_code)
         if line is None:
             return
-        direction = self._get_direction(train.first_stop_code)
+        direction = self._get_direction(train.first_stop_code, train.last_stop_code, line)
         # Consult the PREVIOUS cycle's state so an update path (and _try_keep_segment
         # within _find_prev_next) actually fires across cycles -- including for a
         # train that was carried forward through the grace window and is now
@@ -524,7 +524,33 @@ class TrainManager:
             return True
         return now >= start_time
 
-    def _get_direction(self, first_stop_code) -> Direction:
+    def _get_direction(self, first_stop_code: str, last_stop_code: str, line: Line) -> Direction:
+        """Resolve a trip's direction along its line.
+
+        Direction is TO_UNION when the trip travels toward Union and FROM_UNION
+        when it travels away. Rather than assuming Union is the trip's origin or
+        terminus, this compares how far the trip's true origin and destination
+        sit from Union's own position on the line (``distance_on_line``): if the
+        destination is nearer to Union than the origin, the trip is heading in.
+
+        Because it keys off the origin/destination positions instead of "is the
+        first stop Union", service-change trips that never touch Union (e.g.
+        Barrie running only Allandale Waterfront <-> Downsview Park) still
+        resolve correctly. For any trip that does start or end at Union this
+        yields the same answer as the old first-stop check.
+
+        Fall back to the origin-is-Union heuristic when Union or either endpoint
+        is missing from the line (e.g. an unfamiliar bus-substitution code), so a
+        stop absent from the schedule extract never crashes direction resolution.
+        """
+        union_stop = line.stops_by_id.get("UN")
+        first_stop = line.stops_by_id.get(first_stop_code)
+        last_stop = line.stops_by_id.get(last_stop_code)
+        if union_stop is not None and first_stop is not None and last_stop is not None:
+            union_dist = union_stop.distance_on_line
+            origin_gap = abs(first_stop.distance_on_line - union_dist)
+            dest_gap = abs(last_stop.distance_on_line - union_dist)
+            return Direction.TO_UNION if dest_gap < origin_gap else Direction.FROM_UNION
         return Direction.FROM_UNION if first_stop_code == "UN" else Direction.TO_UNION
     
     def _parse_datetime(self, value: str) -> datetime:

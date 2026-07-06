@@ -1,6 +1,7 @@
 import logging
 from enum import Enum
 from datetime import datetime
+from typing import Callable
 from shapely import Point
 from dataclasses import dataclass, replace
 
@@ -73,9 +74,15 @@ class TrainState:
     stopped_at_stop_code: str
 
 class TrainManager:
-    def __init__(self, line_contexts: dict[LINE_CODES, Line], lw_route_contexts: dict[str, Line] | None = None)-> None:
+    def __init__(self, line_contexts: dict[LINE_CODES, Line], lw_route_contexts: dict[str, Line] | None = None, now: Callable[[], datetime] = datetime.now)-> None:
         self.line_contexts = line_contexts
         self.lw_route_contexts = lw_route_contexts or {}
+        # Injection seam for time, mirroring DataRefresher's `now` seam: used to
+        # judge whether a trip has reached its scheduled start time (the
+        # not-yet-in-service filter) and to age completed-train afterlives. Tests
+        # advance a fake clock across a start time without sleeping. Defaults to
+        # datetime.now, so production behavior is unchanged.
+        self._now = now
         self.states: dict[str, TrainState] = {}
         # Consecutive missed-cycle counts per trip, for the dropout grace window.
         # A trip appears here only while it is being carried forward through its
@@ -90,7 +97,15 @@ class TrainManager:
         self._unknown_line_codes_seen: set[str] = set()
 
     def upsert_many(self, trains: list[GoTrain], stop_codes_by_trip: dict[str, list[str]] | None = None) -> None:
-        now = datetime.now()
+        now = self._now()
+        # Hide not-yet-in-service trains (issue #4). The live feed lists trips in
+        # advance of departure; a trip whose scheduled start time has not yet been
+        # reached is not actually running, so drop it before it touches any cycle
+        # state. Filtering here (rather than at publish) keeps a future trip fully
+        # invisible: it is never mapped, never counted as "found", and never
+        # affects the dropout-grace bookkeeping. Once its start time passes it flows
+        # through normally.
+        trains = [train for train in trains if self._is_in_service(train, now)]
         stop_codes_by_trip = stop_codes_by_trip or {}
         prev_states = dict(self.states)
         found_trip_numbers = {train.trip_number for train in trains if train.trip_number}
@@ -489,6 +504,26 @@ class TrainManager:
 
         return stopped_at_stop_code
     
+    def _is_in_service(self, train: GoTrain, now: datetime) -> bool:
+        """Whether a trip has reached its scheduled start time and may be displayed.
+
+        A trip is in service once ``now >= start_time`` (boundary inclusive: at
+        exactly the start time it is shown). Trains scheduled to depart later come
+        through the live feed in advance but are not actually running yet, so they
+        are hidden until then.
+
+        Fail open on an unparseable start time: return ``True`` so a malformed
+        value never silently hides a genuinely running train. Such a record is
+        instead caught by the existing per-record mapping-error path in
+        ``_upsert_one`` (which also parses the start time), keeping the two failure
+        modes -- "not yet in service" vs. "bad data" -- cleanly separated.
+        """
+        try:
+            start_time = self._parse_datetime(train.start_time)
+        except ValueError:
+            return True
+        return now >= start_time
+
     def _get_direction(self, first_stop_code) -> Direction:
         return Direction.FROM_UNION if first_stop_code == "UN" else Direction.TO_UNION
     

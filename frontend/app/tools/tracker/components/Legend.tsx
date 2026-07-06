@@ -11,7 +11,13 @@ const lines = {
     ST: ["Stouffville", "#774111"],
 };
 
-export default function Legend() {
+interface LegendProps {
+    // When true, show the entry explaining the dimmed (out-of-service) line
+    // state. Gated so the legend stays minimal while every line runs (issue #28).
+    showOutOfService?: boolean;
+}
+
+export default function Legend({ showOutOfService = false }: LegendProps) {
     const [isOpen, setIsOpen] = useState(false);
     const renderLineItem = (key: string, name: string, color: string) => (
         <div key={key} className="flex items-center gap-3 ">
@@ -22,6 +28,19 @@ export default function Legend() {
                 {key}
             </div>
             <span className="text-sm text-neutral-100">{name}</span>
+        </div>
+    );
+
+    // Swatch mirrors the map's dimming: an out-of-service line keeps its colour
+    // but renders at 0.3 opacity (see Line.tsx). A neutral square stands in for
+    // "any line" since the state applies regardless of colour.
+    const renderOutOfServiceItem = () => (
+        <div key="out-of-service" className="flex items-center gap-3 ">
+            <div
+                className="h-8 w-8 bg-neutral-400"
+                style={{ opacity: 0.3 }}
+            />
+            <span className="text-sm text-neutral-100">No service today</span>
         </div>
     );
 
@@ -52,6 +71,7 @@ export default function Legend() {
                 {Object.entries(lines).map(([key, [name, color]]) =>
                     renderLineItem(key, name, color),
                 )}
+                {showOutOfService && renderOutOfServiceItem()}
             </div>
         </div>
     );

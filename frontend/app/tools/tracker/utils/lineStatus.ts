@@ -41,3 +41,17 @@ export function isLineOutOfService(
 ): boolean {
     return statuses?.[lineCode] === false;
 }
+
+/**
+ * Whether at least one line is currently out of service (dimmed on the map).
+ * Used to show the legend's "no service today" entry only when it's relevant;
+ * missing/empty data (fail open) means no line is dimmed, so this returns false.
+ */
+export function hasOutOfServiceLine(
+    statuses: LineStatuses | undefined,
+): boolean {
+    if (!statuses) {
+        return false;
+    }
+    return Object.values(statuses).some((inService) => inService === false);
+}

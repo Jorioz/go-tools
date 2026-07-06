@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 
 import {
     LineStatusesSchema,
+    hasOutOfServiceLine,
     isLineOutOfService,
     parseLineStatuses,
 } from "./lineStatus.ts";
@@ -41,5 +42,26 @@ describe("parseLineStatuses (issue #26 optional field, fail-open)", () => {
 
         // LE was not reported -> default in service, never dimmed.
         assert.equal(isLineOutOfService(statuses, "LE"), false);
+    });
+});
+
+describe("hasOutOfServiceLine (issue #28 dimmed-legend gating)", () => {
+    it("is false for missing/empty data (fail open, nothing dimmed)", () => {
+        assert.equal(hasOutOfServiceLine(undefined), false);
+        assert.equal(hasOutOfServiceLine({}), false);
+    });
+
+    it("is false when every reported line is in service", () => {
+        const statuses = parseLineStatuses(
+            LineStatusesSchema.parse({ MI: "in_service", LW: "in_service" }),
+        );
+        assert.equal(hasOutOfServiceLine(statuses), false);
+    });
+
+    it("is true when at least one line is out of service", () => {
+        const statuses = parseLineStatuses(
+            LineStatusesSchema.parse({ MI: "out_of_service", LW: "in_service" }),
+        );
+        assert.equal(hasOutOfServiceLine(statuses), true);
     });
 });

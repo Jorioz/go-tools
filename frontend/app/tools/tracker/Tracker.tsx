@@ -7,6 +7,7 @@ import Legend from "./components/Legend";
 import InfoBox from "./components/InfoBox";
 import type { Train } from "~/models/train";
 import { useMapSelectionContext } from "~/context/mapSelectionContext";
+import { hasOutOfServiceLine } from "./utils/lineStatus";
 
 export default function Tracker() {
     const { trainsByLine, lineStatuses, isLoading, error, refresh, lastUpdated } =
@@ -39,7 +40,9 @@ export default function Tracker() {
             />
             <InfoBox />
             <div className="fixed bottom-3 w-full flex justify-between md:justify-start md:gap-3 items-end z-40 px-2">
-                <Legend />
+                <Legend
+                    showOutOfService={hasOutOfServiceLine(lineStatuses)}
+                />
                 <div className="flex items-center justify-center h-full w-fit">
                     <Timer />
                 </div>

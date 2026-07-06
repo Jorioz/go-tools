@@ -14,8 +14,8 @@ export default function InfoBox(_: InfoBoxProps) {
         <aside
             className={`fixed z-50 h-auto w-screen rounded-t-md border border-neutral-700 bg-neutral-900/95 p-4 text-neutral-100 shadow-xl transition-transform duration-300 ease-in-out md:left-0 md:top-0 md:h-screen md:w-80 md:rounded-none ${
                 isActive
-                    ? "translate-y-0 md:translate-x-0"
-                    : "translate-y-full md:-translate-x-[120%]"
+                    ? "translate-y-0 md:translate-x-0 md:translate-y-0"
+                    : "translate-y-full md:translate-y-0 md:-translate-x-[120%]"
             } ${isActive ? "pointer-events-auto" : "pointer-events-none"} bottom-0 left-0 right-0`}
             aria-hidden={!isActive}
         >

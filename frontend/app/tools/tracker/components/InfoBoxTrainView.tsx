@@ -78,45 +78,73 @@ export default function InfoBoxTrainView({ train }: { train: Train }) {
                     <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-400">
                         Remaining stops
                     </div>
-                    <ol className="space-y-1 text-sm">
+                    <ol className="text-sm">
                         {routeStops.map((stop, i) => {
                             const isSkipped = stop.status === "skipped";
+                            const isFirst = i === 0;
+                            const isLast = i === routeStops.length - 1;
                             return (
                                 <li
                                     key={`${stop.stopCode}-${i}`}
-                                    className={`flex items-center gap-2 ${
+                                    className={`flex items-stretch gap-2 ${
                                         isSkipped
                                             ? "text-neutral-500"
                                             : "text-neutral-300"
                                     }`}
                                 >
-                                    <span
-                                        className="h-2 w-2 shrink-0 rounded-full"
-                                        style={
-                                            isSkipped
-                                                ? {
-                                                      backgroundColor:
-                                                          "transparent",
-                                                      border: `1px solid #6b7280`,
-                                                  }
-                                                : {
-                                                      backgroundColor:
-                                                          line.color,
-                                                  }
-                                        }
-                                    />
-                                    <span
-                                        className={
-                                            isSkipped ? "line-through" : ""
-                                        }
-                                    >
-                                        {stop.name}
-                                    </span>
-                                    {isSkipped && (
-                                        <span className="text-[10px] uppercase tracking-wide text-neutral-600">
-                                            skipped
+                                    {/* Dot + connecting line, so the list reads
+                                        like a mini train line. The connector is
+                                        drawn in two halves that meet at the row
+                                        boundary, so segments join seamlessly
+                                        across stops. Dot center sits 10px from
+                                        the row top (6px offset + half of 8px). */}
+                                    <div className="relative w-2 shrink-0 self-stretch">
+                                        {!isFirst && (
+                                            <span
+                                                className="absolute left-1/2 top-0 h-[10px] w-0.5 -translate-x-1/2"
+                                                style={{
+                                                    backgroundColor: line.color,
+                                                }}
+                                            />
+                                        )}
+                                        {!isLast && (
+                                            <span
+                                                className="absolute bottom-0 left-1/2 top-[10px] w-0.5 -translate-x-1/2"
+                                                style={{
+                                                    backgroundColor: line.color,
+                                                }}
+                                            />
+                                        )}
+                                        <span
+                                            className="absolute left-1/2 top-1.5 h-2 w-2 -translate-x-1/2 rounded-full"
+                                            style={
+                                                isSkipped
+                                                    ? {
+                                                          backgroundColor:
+                                                              "transparent",
+                                                          border: `1px solid #6b7280`,
+                                                      }
+                                                    : {
+                                                          backgroundColor:
+                                                              line.color,
+                                                      }
+                                            }
+                                        />
+                                    </div>
+                                    <div className="flex items-center gap-2 pb-2">
+                                        <span
+                                            className={
+                                                isSkipped ? "line-through" : ""
+                                            }
+                                        >
+                                            {stop.name}
                                         </span>
-                                    )}
+                                        {isSkipped && (
+                                            <span className="text-[10px] uppercase tracking-wide text-neutral-600">
+                                                not stopping
+                                            </span>
+                                        )}
+                                    </div>
                                 </li>
                             );
                         })}
